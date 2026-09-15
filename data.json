@@ -7,7 +7,7 @@
   "socials": {
     "instagram": "https://instagram.com/jadilebihfit",
     "whatsapp": "https://wa.me/6285286535908",
-    "tiktok": "https://www.tiktok.com/@jadilebihfit",
+    "tiktok": "https://www.tiktok.com/@jadilebih.fit",
     "youtube": "https://www.youtube.com/@jadilebihfit"
   },
   "sections": [
@@ -61,14 +61,6 @@
           "badge": "Gratis",
           "style": "gold",
           "icon": "chart"
-        },
-        {
-          "title": "Cek BMI & Berat Ideal",
-          "subtitle": "Tau posisi kau sekarang di mana",
-          "url": "https://tools.jadilebihfit.xyz",
-          "badge": "Gratis",
-          "style": "gold",
-          "icon": "clock"
         },
         {
           "title": "Semua Tools Fitness",
