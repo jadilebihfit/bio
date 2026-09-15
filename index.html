@@ -170,10 +170,14 @@
       padding: 4px;
       gap: 2px;
       margin-bottom: 14px;
+      overflow-x: auto;
+      scrollbar-width: none;
     }
+    .tabs::-webkit-scrollbar { display: none; }
 
     .tab-btn {
       flex: 1;
+      min-width: 70px;
       padding: 8px 6px;
       border: none;
       border-radius: 999px;
@@ -189,6 +193,7 @@
       transition: background 0.2s, color 0.2s, box-shadow 0.2s;
       outline: 1.5px solid transparent;
       outline-offset: -1px;
+      white-space: nowrap;
     }
 
     /* shimmer sweep on inactive tabs */
@@ -206,10 +211,10 @@
       animation: tabShimmer 3s ease-in-out infinite;
     }
 
-    /* stagger shimmer so each tab fires at different time */
     .tab-btn:not(.active):nth-child(2)::before { animation-delay: 0.4s; }
     .tab-btn:not(.active):nth-child(3)::before { animation-delay: 0.8s; }
     .tab-btn:not(.active):nth-child(4)::before { animation-delay: 1.2s; }
+    .tab-btn:not(.active):nth-child(5)::before { animation-delay: 1.6s; }
 
     @keyframes tabShimmer {
       0%   { transform: translateX(-100%); opacity: 0; }
@@ -226,6 +231,7 @@
     .tab-btn:not(.active):nth-child(2) { animation-delay: 0.4s; }
     .tab-btn:not(.active):nth-child(3) { animation-delay: 0.8s; }
     .tab-btn:not(.active):nth-child(4) { animation-delay: 1.2s; }
+    .tab-btn:not(.active):nth-child(5) { animation-delay: 1.6s; }
 
     @keyframes tabGlow {
       0%, 100% { outline-color: transparent;            color: var(--muted); }
@@ -249,7 +255,9 @@
     }
     .tab-btn.active::before { display: none; }
 
-    /* ── Tab panels ── */
+    /* ── Tab panels container ── */
+    #panels-container { width: 100%; }
+
     .panel { display: none; width: 100%; flex-direction: column; gap: 10px; }
     .panel.active { display: flex; animation: fadeUp 0.22s ease; }
     @keyframes fadeUp {
@@ -288,7 +296,6 @@
       cursor: pointer;
     }
 
-    /* gold shimmer top edge */
     .link-card::before {
       content: "";
       position: absolute;
@@ -427,7 +434,7 @@
 
     .social-btn svg { width: 17px; height: 17px; fill: currentColor; }
 
-    /* ── Divider ── */
+    /* ── Divider & Footer ── */
     .divider {
       width: 100%;
       height: 1px;
@@ -435,7 +442,6 @@
       margin: 28px 0 0;
     }
 
-    /* ── Footer ── */
     .footer {
       margin-top: 20px;
       font-size: 11px;
@@ -456,6 +462,213 @@
       pointer-events: none;
     }
 
+    /* ════════════════════════════════════════════════
+       ADMIN TRIGGER & MODAL STYLES
+       ════════════════════════════════════════════════ */
+    .admin-float-btn {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid hsl(var(--gold) / .35);
+      color: hsl(var(--gold-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 99;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 15px hsl(var(--gold) / .2);
+      transition: transform 0.2s, background 0.2s, border-color 0.2s;
+    }
+    .admin-float-btn:hover {
+      transform: scale(1.1) rotate(30deg);
+      background: var(--surface2);
+      border-color: hsl(var(--gold));
+    }
+    .admin-float-btn svg { width: 20px; height: 20px; }
+
+    /* Admin Modal Backdrop */
+    .admin-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: fadeIn 0.2s ease;
+    }
+    .admin-modal-backdrop.open { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .admin-modal {
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      background: hsl(36 8% 10%);
+      border: 1px solid hsl(var(--gold) / .35);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.9), 0 0 40px hsl(var(--gold) / .15);
+      overflow: hidden;
+      color: var(--text);
+    }
+
+    .admin-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: hsl(36 8% 8%);
+    }
+    .admin-header h2 {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      color: hsl(var(--gold-light));
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .admin-close {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 20px;
+      padding: 4px;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .admin-close:hover { color: #fff; }
+
+    /* Admin Navigation Tabs */
+    .admin-nav {
+      display: flex;
+      background: hsl(36 8% 7%);
+      border-bottom: 1px solid var(--border);
+      padding: 4px;
+      gap: 4px;
+      overflow-x: auto;
+    }
+    .admin-nav-btn {
+      flex: 1;
+      padding: 8px 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      color: var(--muted);
+      transition: background 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    .admin-nav-btn.active {
+      background: hsl(var(--gold) / .15);
+      color: hsl(var(--gold-light));
+      border: 1px solid hsl(var(--gold) / .3);
+    }
+
+    .admin-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .admin-view { display: none; flex-direction: column; gap: 14px; }
+    .admin-view.active { display: flex; }
+
+    /* Form controls */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: hsl(var(--gold-light));
+    }
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      background: hsl(36 8% 7%);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13.5px;
+      transition: border-color 0.2s;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: hsl(var(--gold));
+    }
+    textarea.form-control { min-height: 70px; resize: vertical; }
+
+    /* Action Buttons */
+    .btn-admin {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.15s, opacity 0.2s, background 0.2s;
+    }
+    .btn-admin-primary {
+      background: linear-gradient(180deg, hsl(46 82% 62%), hsl(42 72% 46%));
+      color: hsl(40 40% 8%);
+    }
+    .btn-admin-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+    .btn-admin-danger {
+      background: rgba(255, 69, 58, 0.15);
+      border: 1px solid rgba(255, 69, 58, 0.35);
+      color: #ff453a;
+    }
+    .btn-admin-danger:hover { background: rgba(255, 69, 58, 0.25); }
+    .btn-admin-secondary {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-admin-secondary:hover { background: hsl(40 8% 18%); }
+
+    /* Admin List Items */
+    .admin-item-card {
+      background: hsl(36 8% 8%);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .admin-item-card:hover { border-color: hsl(var(--gold) / .3); }
+    .admin-item-info { flex: 1; min-width: 0; }
+    .admin-item-title { font-size: 13.5px; font-weight: 600; color: var(--text); }
+    .admin-item-sub { font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .admin-item-actions { display: flex; gap: 6px; }
+
     @media (min-width: 520px) {
       .wrapper    { padding-top: 76px; }
       .profile h1 { font-size: 26px; }
@@ -464,178 +677,33 @@
   </style>
 </head>
 <body>
+
 <div class="wrapper">
 
   <!-- Profile -->
   <div class="profile">
     <div class="avatar-ring">
-      <img src="profile.jpg" alt="JadiLebihFit" loading="eager" />
+      <img id="ui-avatar" src="profile.jpg" alt="JadiLebihFit" loading="eager" />
     </div>
-    <h1 class="gold-grad">JadiLebihFit</h1>
-    <p class="tagline">Fitness Coach &amp; Health Creator</p>
-    <p class="bio">Bantu kau hidup lebih sehat, lebih kuat, dan lebih percaya diri — dari latihan sampai pola makan. Mantap kali, kan?</p>
+    <h1 class="gold-grad" id="ui-name">JadiLebihFit</h1>
+    <p class="tagline" id="ui-tagline">Fitness Coach &amp; Health Creator</p>
+    <p class="bio" id="ui-bio">Bantu kau hidup lebih sehat, lebih kuat, dan lebih percaya diri — dari latihan sampai pola makan. Mantap kali, kan?</p>
   </div>
 
-  <!-- Tabs -->
+  <!-- Dynamic Tabs -->
   <div class="tabs-wrapper">
     <p class="tabs-hint">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       Pilih kategori di bawah ini
     </p>
-    <div class="tabs" role="tablist">
-      <button class="tab-btn active" role="tab" aria-selected="true"  data-panel="collab">Kolaborasi</button>
-      <button class="tab-btn"        role="tab" aria-selected="false" data-panel="coaching">Coaching</button>
-      <button class="tab-btn"        role="tab" aria-selected="false" data-panel="tools">Tools</button>
-      <button class="tab-btn"        role="tab" aria-selected="false" data-panel="stori">Stori</button>
+    <div class="tabs" id="ui-tabs" role="tablist">
+      <!-- Generated by JS -->
     </div>
   </div>
 
-  <!-- Panel: Kolaborasi -->
-  <div class="panel active" id="panel-collab" role="tabpanel">
-    <p class="section-label">Endorsement &amp; Kerjasama</p>
-    <a class="link-card"
-       href="https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20tertarik%20nak%20kerja%20sama%20atau%20endorse%20sama%20JadiLebihFit.%20Ini%20detail%20aku%20bang%3A%0A%0ANama%20Brand%2FProduk%3A%20%5Bisi%20di%20sini%5D%0AJenis%20Kerja%20Sama%3A%20%5BEndorsement%20%2F%20Paid%20Promote%20%2F%20Affiliate%20%2F%20Lainnya%5D%0AProduk%2FLayanan%3A%20%5Bceritain%20singkat%20bang%5D%0ATimeline%3A%20%5Bkapan%20dibutuhkan%5D%0ABudget%3A%20%5Bjika%20ada%5D%0A%0AMakasih%20bang%2C%20ditunggu%20ya!"
-       target="_blank" rel="noopener noreferrer">
-      <div class="card-left">
-        <div class="card-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="hsl(46,82%,62%)" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 20h5v-2a3 3 0 0 0-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 0 1 5.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 0 1 9.288 0M15 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM7 10a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/>
-          </svg>
-        </div>
-        <div class="card-text">
-          <div class="card-title">Endorsement &amp; Kerjasama</div>
-          <div class="card-sub"><span class="badge badge-gold">WhatsApp</span> Chat bang, jangan segan-segan</div>
-        </div>
-      </div>
-      <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
-      </svg>
-    </a>
-  </div>
-
-  <!-- Panel: Coaching -->
-  <div class="panel" id="panel-coaching" role="tabpanel">
-    <p class="section-label">Program Coaching</p>
-    <a class="link-card"
-       href="https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20mau%20daftar%20Coaching%20Online%20JadiLebihFit.%20Ini%20info%20aku%20bang%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20naik%20massa%20otot%5D%0APreferensi%3A%20Online%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0AMantap%20kali%20bang%2C%20makasih!"
-       target="_blank" rel="noopener noreferrer">
-      <div class="card-left">
-        <div class="card-icon blue-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="hsl(214,82%,70%)" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/>
-          </svg>
-        </div>
-        <div class="card-text">
-          <div class="card-title">Coaching Online</div>
-          <div class="card-sub"><span class="badge badge-blue">Virtual</span> Program personal dari mana pun kau berada</div>
-        </div>
-      </div>
-      <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
-      </svg>
-    </a>
-    <a class="link-card"
-       href="https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20mau%20daftar%20Coaching%20Offline%20JadiLebihFit.%20Ini%20info%20aku%20bang%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20naik%20massa%20otot%5D%0ALokasi%3A%20%5Bkota%20%2F%20gym%20mana%20bang%5D%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0AMantap%20kali%20bang%2C%20makasih!"
-       target="_blank" rel="noopener noreferrer">
-      <div class="card-left">
-        <div class="card-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="hsl(46,82%,62%)" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
-            <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
-          </svg>
-        </div>
-        <div class="card-text">
-          <div class="card-title">Coaching Offline</div>
-          <div class="card-sub"><span class="badge badge-gold">Tatap Muka</span> Latihan langsung sama bang coach</div>
-        </div>
-      </div>
-      <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
-      </svg>
-    </a>
-  </div>
-
-  <!-- Panel: Tools -->
-  <div class="panel" id="panel-tools" role="tabpanel">
-    <p class="section-label">Bantu Progres Kau</p>
-    <a class="link-card"
-       href="https://tools.jadilebihfit.xyz"
-       target="_blank" rel="noopener noreferrer">
-      <div class="card-left">
-        <div class="card-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="hsl(46,82%,62%)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7">
-            <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
-          </svg>
-        </div>
-        <div class="card-text">
-          <div class="card-title">Hitung Kalori &amp; Makro</div>
-          <div class="card-sub"><span class="badge badge-gold">Gratis</span> Tau berapa yang kau perlu makan</div>
-        </div>
-      </div>
-      <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
-      </svg>
-    </a>
-    <a class="link-card"
-       href="https://tools.jadilebihfit.xyz"
-       target="_blank" rel="noopener noreferrer">
-      <div class="card-left">
-        <div class="card-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="hsl(46,82%,62%)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7">
-            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
-          </svg>
-        </div>
-        <div class="card-text">
-          <div class="card-title">Cek BMI &amp; Berat Ideal</div>
-          <div class="card-sub"><span class="badge badge-gold">Gratis</span> Tau posisi kau sekarang di mana</div>
-        </div>
-      </div>
-      <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
-      </svg>
-    </a>
-    <a class="link-card"
-       href="https://tools.jadilebihfit.xyz"
-       target="_blank" rel="noopener noreferrer">
-      <div class="card-left">
-        <div class="card-icon blue-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="hsl(214,82%,70%)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-          </svg>
-        </div>
-        <div class="card-text">
-          <div class="card-title">Semua Tools Fitness</div>
-          <div class="card-sub"><span class="badge badge-blue">LebihFit</span> Lengkap, gratis, dan mantap kali</div>
-        </div>
-      </div>
-      <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
-      </svg>
-    </a>
-  </div>
-
-  <!-- Panel: Stori -->
-  <div class="panel" id="panel-stori" role="tabpanel">
-    <p class="section-label">Perjalanan Saya</p>
-    <a class="link-card"
-       href="https://stori.jadilebihfit.xyz"
-       target="_blank" rel="noopener noreferrer">
-      <div class="card-left">
-        <div class="card-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="hsl(46,82%,62%)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7">
-            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-            <circle cx="12" cy="12" r="3"/>
-          </svg>
-        </div>
-        <div class="card-text">
-          <div class="card-title">Stori JadiLebihFit</div>
-          <div class="card-sub"><span class="badge badge-gold">Perjalanan</span> Kisah nyata di balik transformasi aku</div>
-        </div>
-      </div>
-      <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
-      </svg>
-    </a>
+  <!-- Dynamic Tab Panels -->
+  <div id="panels-container">
+    <!-- Generated by JS -->
   </div>
 
   <!-- Divider -->
@@ -661,29 +729,512 @@
 
 </div>
 
+<!-- ════════════════════════════════════════════════
+     ADMIN FLOATING BUTTON & MODAL
+     ════════════════════════════════════════════════ -->
+<button class="admin-float-btn" id="btn-open-admin" title="Buka Menu Admin">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+</button>
+
+<div class="admin-modal-backdrop" id="admin-modal">
+  <div class="admin-modal">
+    <div class="admin-header">
+      <h2>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Menu Admin JadiLebihFit
+      </h2>
+      <button class="admin-close" id="btn-close-admin">&times;</button>
+    </div>
+
+    <div class="admin-nav">
+      <button class="admin-nav-btn active" data-view="view-items">Kelola Item/Link</button>
+      <button class="admin-nav-btn" data-view="view-sections">Kelola Section</button>
+      <button class="admin-nav-btn" data-view="view-profile">Edit Profil</button>
+      <button class="admin-nav-btn" data-view="view-backup">Backup Data</button>
+    </div>
+
+    <div class="admin-body">
+      <!-- VIEW: Kelola Items -->
+      <div class="admin-view active" id="view-items">
+        <div class="form-group">
+          <label>Pilih Section / Tab</label>
+          <select class="form-control" id="select-item-section"></select>
+        </div>
+
+        <div id="admin-items-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+
+        <button class="btn-admin btn-admin-primary" id="btn-show-add-item">+ Tambah Menu / Link Baru</button>
+
+        <!-- Form Tambah/Edit Item -->
+        <div id="form-item-container" style="display:none; background:hsl(36 8% 7%); border:1px solid var(--border); border-radius:10px; padding:14px; margin-top:8px;">
+          <h3 id="form-item-title" style="font-size:13px; color:hsl(var(--gold-light)); margin-bottom:10px;">Tambah Item Baru</h3>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <input type="hidden" id="edit-item-index" value="-1" />
+            <div class="form-group">
+              <label>Judul Menu</label>
+              <input type="text" class="form-control" id="item-title" placeholder="Contoh: Konsultasi Khusus" />
+            </div>
+            <div class="form-group">
+              <label>Subtitle / Deskripsi Singkat</label>
+              <input type="text" class="form-control" id="item-subtitle" placeholder="Contoh: Chat langsung sama coach" />
+            </div>
+            <div class="form-group">
+              <label>URL / Link Tujuan (WA / Website)</label>
+              <input type="text" class="form-control" id="item-url" placeholder="https://wa.me/... atau https://..." />
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <div class="form-group">
+                <label>Teks Badge</label>
+                <input type="text" class="form-control" id="item-badge" placeholder="Contoh: WhatsApp / Gratis" />
+              </div>
+              <div class="form-group">
+                <label>Warna Badge &amp; Icon</label>
+                <select class="form-control" id="item-badge-style">
+                  <option value="gold">Gold (Emas)</option>
+                  <option value="blue">Blue (Biru)</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Pilihan Icon</label>
+              <select class="form-control" id="item-icon">
+                <option value="wa">WhatsApp / Team</option>
+                <option value="dumbbell">Dumbbell / Fitness</option>
+                <option value="screen">Monitor / Virtual</option>
+                <option value="chart">Grafik / Chart Progress</option>
+                <option value="clock">Jam / Target</option>
+                <option value="pulse">Pulse / Tools</option>
+                <option value="eye">Mata / Story</option>
+                <option value="link">Link Eksternal</option>
+              </select>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:4px;">
+              <button class="btn-admin btn-admin-primary" id="btn-save-item" style="flex:1;">Simpan Item</button>
+              <button class="btn-admin btn-admin-secondary" id="btn-cancel-item">Batal</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: Kelola Section -->
+      <div class="admin-view" id="view-sections">
+        <p style="font-size:12px; color:var(--muted);">Tambah atau ubah kategori tab navigasi di halaman bio:</p>
+        <div id="admin-sections-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+
+        <div style="display:flex; gap:8px; margin-top:8px;">
+          <input type="text" class="form-control" id="new-section-name" placeholder="Nama Section Baru (cth: E-Book)" />
+          <button class="btn-admin btn-admin-primary" id="btn-add-section" style="white-space:nowrap;">+ Tambah Section</button>
+        </div>
+      </div>
+
+      <!-- VIEW: Edit Profil -->
+      <div class="admin-view" id="view-profile">
+        <div class="form-group">
+          <label>Nama Brand / Profil</label>
+          <input type="text" class="form-control" id="prof-name" />
+        </div>
+        <div class="form-group">
+          <label>Tagline</label>
+          <input type="text" class="form-control" id="prof-tagline" />
+        </div>
+        <div class="form-group">
+          <label>Bio Singkat (Logat Medan)</label>
+          <textarea class="form-control" id="prof-bio"></textarea>
+        </div>
+        <button class="btn-admin btn-admin-primary" id="btn-save-profile">Simpan Perubahan Profil</button>
+      </div>
+
+      <!-- VIEW: Backup / Export -->
+      <div class="admin-view" id="view-backup">
+        <p style="font-size:12px; color:var(--muted); line-height:1.5;">Semua perubahan tersimpan otomatis di browser ini. Lo bisa salin data konfigurasi untuk backup kapan saja:</p>
+        <textarea class="form-control" id="backup-json" readonly style="font-size:11px; font-family:monospace; min-height:110px;"></textarea>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-admin btn-admin-secondary" id="btn-copy-backup" style="flex:1;">📋 Salin Data JSON</button>
+          <button class="btn-admin btn-admin-danger" id="btn-reset-default">Reset ke Awal</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-  const tabs   = document.querySelectorAll('.tab-btn');
-  const panels = document.querySelectorAll('.panel');
-  tabs.forEach(btn => {
+  const ICONS = {
+    wa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20h5v-2a3 3 0 0 0-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 0 1 5.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 0 1 9.288 0M15 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM7 10a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg>',
+    dumbbell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>',
+    screen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>',
+    chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+    pulse: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+    eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
+    link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'
+  };
+
+  const DEFAULT_DATA = {
+    profile: {
+      name: "JadiLebihFit",
+      tagline: "Fitness Coach & Health Creator",
+      bio: "Bantu kau hidup lebih sehat, lebih kuat, dan lebih percaya diri — dari latihan sampai pola makan. Mantap kali, kan?"
+    },
+    sections: [
+      {
+        id: "collab",
+        title: "Kolaborasi",
+        label: "Endorsement & Kerjasama",
+        items: [
+          {
+            title: "Endorsement & Kerjasama",
+            subtitle: "Chat bang, jangan segan-segan",
+            url: "https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20tertarik%20nak%20kerja%20sama%20atau%20endorse%20sama%20JadiLebihFit.%20Ini%20detail%20aku%20bang%3A%0A%0ANama%20Brand%2FProduk%3A%20%5Bisi%20di%20sini%5D%0AJenis%20Kerja%20Sama%3A%20%5BEndorsement%20%2F%20Paid%20Promote%20%2F%20Affiliate%20%2F%20Lainnya%5D%0AProduk%2FLayanan%3A%20%5Bceritain%20singkat%20bang%5D%0ATimeline%3A%20%5Bkapan%20dibutuhkan%5D%0ABudget%3A%20%5Bjika%20ada%5D%0A%0AMakasih%20bang%2C%20ditunggu%20ya!",
+            badge: "WhatsApp",
+            style: "gold",
+            icon: "wa"
+          }
+        ]
+      },
+      {
+        id: "coaching",
+        title: "Coaching",
+        label: "Program Coaching",
+        items: [
+          {
+            title: "Coaching Online",
+            subtitle: "Program personal dari mana pun kau berada",
+            url: "https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20mau%20daftar%20Coaching%20Online%20JadiLebihFit.%20Ini%20info%20aku%20bang%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20naik%20massa%20otot%5D%0APreferensi%3A%20Online%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0AMantap%20kali%20bang%2C%20makasih!",
+            badge: "Virtual",
+            style: "blue",
+            icon: "screen"
+          },
+          {
+            title: "Coaching Offline",
+            subtitle: "Latihan langsung sama bang coach",
+            url: "https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20mau%20daftar%20Coaching%20Offline%20JadiLebihFit.%20Ini%20info%20aku%20bang%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20naik%20massa%20otot%5D%0ALokasi%3A%20%5Bkota%20%2F%20gym%20mana%20bang%5D%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0AMantap%20kali%20bang%2C%20makasih!",
+            badge: "Tatap Muka",
+            style: "gold",
+            icon: "dumbbell"
+          }
+        ]
+      },
+      {
+        id: "tools",
+        title: "Tools",
+        label: "Bantu Progres Kau",
+        items: [
+          {
+            title: "Hitung Kalori & Makro",
+            subtitle: "Tau berapa yang kau perlu makan",
+            url: "https://tools.jadilebihfit.xyz",
+            badge: "Gratis",
+            style: "gold",
+            icon: "chart"
+          },
+          {
+            title: "Cek BMI & Berat Ideal",
+            subtitle: "Tau posisi kau sekarang di mana",
+            url: "https://tools.jadilebihfit.xyz",
+            badge: "Gratis",
+            style: "gold",
+            icon: "clock"
+          },
+          {
+            title: "Semua Tools Fitness",
+            subtitle: "Lengkap, gratis, dan mantap kali",
+            url: "https://tools.jadilebihfit.xyz",
+            badge: "LebihFit",
+            style: "blue",
+            icon: "pulse"
+          }
+        ]
+      },
+      {
+        id: "stori",
+        title: "Stori",
+        label: "Perjalanan Saya",
+        items: [
+          {
+            title: "Stori JadiLebihFit",
+            subtitle: "Kisah nyata di balik transformasi aku",
+            url: "https://stori.jadilebihfit.xyz",
+            badge: "Perjalanan",
+            style: "gold",
+            icon: "eye"
+          }
+        ]
+      }
+    ]
+  };
+
+  let AppData = JSON.parse(localStorage.getItem('jadilebihfit_data')) || DEFAULT_DATA;
+
+  function saveData() {
+    localStorage.setItem('jadilebihfit_data', JSON.stringify(AppData));
+    renderApp();
+    renderAdmin();
+  }
+
+  function renderApp() {
+    document.getElementById('ui-name').textContent = AppData.profile.name;
+    document.getElementById('ui-tagline').textContent = AppData.profile.tagline;
+    document.getElementById('ui-bio').textContent = AppData.profile.bio;
+
+    const tabsContainer = document.getElementById('ui-tabs');
+    const panelsContainer = document.getElementById('panels-container');
+
+    const currentActiveSection = document.querySelector('.tab-btn.active')?.dataset.panel || AppData.sections[0]?.id;
+
+    tabsContainer.innerHTML = AppData.sections.map((sec, i) => {
+      const isActive = sec.id === currentActiveSection || (!AppData.sections.some(s => s.id === currentActiveSection) && i === 0);
+      return '<button class="tab-btn ' + (isActive ? 'active' : '') + '" role="tab" aria-selected="' + isActive + '" data-panel="' + sec.id + '">' + sec.title + '</button>';
+    }).join('');
+
+    panelsContainer.innerHTML = AppData.sections.map((sec, i) => {
+      const isActive = sec.id === currentActiveSection || (!AppData.sections.some(s => s.id === currentActiveSection) && i === 0);
+      const cardsHtml = sec.items.map(item => {
+        const iconSvg = ICONS[item.icon] || ICONS.link;
+        const isBlue = item.style === 'blue';
+        const colorStroke = isBlue ? 'hsl(214,82%,70%)' : 'hsl(46,82%,62%)';
+        const iconClass = isBlue ? 'card-icon blue-icon' : 'card-icon';
+        const badgeClass = isBlue ? 'badge badge-blue' : 'badge badge-gold';
+
+        return '<a class="link-card" href="' + item.url + '" target="_blank" rel="noopener noreferrer">' +
+          '<div class="card-left">' +
+            '<div class="' + iconClass + '">' +
+              iconSvg.replace('stroke="currentColor"', 'stroke="' + colorStroke + '"') +
+            '</div>' +
+            '<div class="card-text">' +
+              '<div class="card-title">' + item.title + '</div>' +
+              '<div class="card-sub"><span class="' + badgeClass + '">' + item.badge + '</span> ' + item.subtitle + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+            '<line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>' +
+          '</svg>' +
+        '</a>';
+      }).join('');
+
+      return '<div class="panel ' + (isActive ? 'active' : '') + '" id="panel-' + sec.id + '" role="tabpanel">' +
+        '<p class="section-label">' + (sec.label || sec.title) + '</p>' +
+        (cardsHtml || '<p style="font-size:12px; color:var(--muted); text-align:center; padding:20px;">Belum ada item di section ini.</p>') +
+      '</div>';
+    }).join('');
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected','true');
+        document.getElementById('panel-' + btn.dataset.panel)?.classList.add('active');
+      });
+    });
+
+    document.querySelectorAll('.link-card').forEach(card => {
+      card.addEventListener('click', function(e) {
+        const r = document.createElement('span');
+        r.classList.add('ripple-fx');
+        const rect = this.getBoundingClientRect();
+        r.style.left = (e.clientX - rect.left) + 'px';
+        r.style.top  = (e.clientY - rect.top)  + 'px';
+        this.appendChild(r);
+        setTimeout(() => r.remove(), 500);
+      });
+    });
+  }
+
+  const modal = document.getElementById('admin-modal');
+  const btnOpenAdmin = document.getElementById('btn-open-admin');
+  const btnCloseAdmin = document.getElementById('btn-close-admin');
+
+  btnOpenAdmin.addEventListener('click', () => {
+    modal.classList.add('open');
+    renderAdmin();
+  });
+  btnCloseAdmin.addEventListener('click', () => modal.classList.remove('open'));
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+
+  document.querySelectorAll('.admin-nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
-      panels.forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.admin-view').forEach(v => v.classList.remove('active'));
       btn.classList.add('active');
-      btn.setAttribute('aria-selected','true');
-      document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+      document.getElementById(btn.dataset.view).classList.add('active');
     });
   });
-  document.querySelectorAll('.link-card').forEach(card => {
-    card.addEventListener('click', function(e) {
-      const r = document.createElement('span');
-      r.classList.add('ripple-fx');
-      const rect = this.getBoundingClientRect();
-      r.style.left = (e.clientX - rect.left) + 'px';
-      r.style.top  = (e.clientY - rect.top)  + 'px';
-      this.appendChild(r);
-      setTimeout(() => r.remove(), 500);
-    });
+
+  function renderAdmin() {
+    const secSelect = document.getElementById('select-item-section');
+    const prevVal = secSelect.value;
+    secSelect.innerHTML = AppData.sections.map(s => '<option value="' + s.id + '">' + s.title + '</option>').join('');
+    if (AppData.sections.some(s => s.id === prevVal)) secSelect.value = prevVal;
+
+    renderAdminItemsList();
+    renderAdminSectionsList();
+
+    document.getElementById('prof-name').value = AppData.profile.name;
+    document.getElementById('prof-tagline').value = AppData.profile.tagline;
+    document.getElementById('prof-bio').value = AppData.profile.bio;
+
+    document.getElementById('backup-json').value = JSON.stringify(AppData, null, 2);
+  }
+
+  function renderAdminItemsList() {
+    const secId = document.getElementById('select-item-section').value;
+    const sec = AppData.sections.find(s => s.id === secId);
+    const container = document.getElementById('admin-items-list');
+
+    if (!sec || !sec.items || sec.items.length === 0) {
+      container.innerHTML = '<p style="font-size:12px; color:var(--muted);">Belum ada menu di section ini.</p>';
+      return;
+    }
+
+    container.innerHTML = sec.items.map((item, idx) => '<div class="admin-item-card">' +
+      '<div class="admin-item-info">' +
+        '<div class="admin-item-title">' + item.title + '</div>' +
+        '<div class="admin-item-sub">' + item.subtitle + ' &middot; <span style="color:hsl(var(--gold-light))">' + item.badge + '</span></div>' +
+      '</div>' +
+      '<div class="admin-item-actions">' +
+        '<button class="btn-admin btn-admin-secondary" onclick="editItem(' + idx + ')" style="padding:6px 10px; font-size:11px;">Edit</button>' +
+        '<button class="btn-admin btn-admin-danger" onclick="deleteItem(' + idx + ')" style="padding:6px 10px; font-size:11px;">Hapus</button>' +
+      '</div>' +
+    '</div>').join('');
+  }
+
+  document.getElementById('select-item-section').addEventListener('change', renderAdminItemsList);
+
+  const formItemContainer = document.getElementById('form-item-container');
+  const btnShowAddItem = document.getElementById('btn-show-add-item');
+  const btnCancelItem = document.getElementById('btn-cancel-item');
+  const btnSaveItem = document.getElementById('btn-save-item');
+
+  btnShowAddItem.addEventListener('click', () => {
+    document.getElementById('edit-item-index').value = "-1";
+    document.getElementById('form-item-title').textContent = "Tambah Item Baru";
+    document.getElementById('item-title').value = "";
+    document.getElementById('item-subtitle').value = "";
+    document.getElementById('item-url').value = "";
+    document.getElementById('item-badge').value = "WhatsApp";
+    document.getElementById('item-badge-style').value = "gold";
+    document.getElementById('item-icon').value = "wa";
+    formItemContainer.style.display = 'block';
+    btnShowAddItem.style.display = 'none';
   });
+
+  btnCancelItem.addEventListener('click', () => {
+    formItemContainer.style.display = 'none';
+    btnShowAddItem.style.display = 'inline-flex';
+  });
+
+  window.editItem = function(index) {
+    const secId = document.getElementById('select-item-section').value;
+    const sec = AppData.sections.find(s => s.id === secId);
+    const item = sec.items[index];
+
+    document.getElementById('edit-item-index').value = index;
+    document.getElementById('form-item-title').textContent = "Edit Menu: " + item.title;
+    document.getElementById('item-title').value = item.title;
+    document.getElementById('item-subtitle').value = item.subtitle;
+    document.getElementById('item-url').value = item.url;
+    document.getElementById('item-badge').value = item.badge;
+    document.getElementById('item-badge-style').value = item.style || 'gold';
+    document.getElementById('item-icon').value = item.icon || 'link';
+
+    formItemContainer.style.display = 'block';
+    btnShowAddItem.style.display = 'none';
+  };
+
+  window.deleteItem = function(index) {
+    if (!confirm('Hapus menu ini?')) return;
+    const secId = document.getElementById('select-item-section').value;
+    const sec = AppData.sections.find(s => s.id === secId);
+    sec.items.splice(index, 1);
+    saveData();
+  };
+
+  btnSaveItem.addEventListener('click', () => {
+    const title = document.getElementById('item-title').value.trim();
+    if (!title) return alert('Judul menu wajib diisi!');
+
+    const secId = document.getElementById('select-item-section').value;
+    const sec = AppData.sections.find(s => s.id === secId);
+    const idx = parseInt(document.getElementById('edit-item-index').value);
+
+    const itemData = {
+      title: title,
+      subtitle: document.getElementById('item-subtitle').value.trim(),
+      url: document.getElementById('item-url').value.trim() || '#',
+      badge: document.getElementById('item-badge').value.trim() || 'Link',
+      style: document.getElementById('item-badge-style').value,
+      icon: document.getElementById('item-icon').value
+    };
+
+    if (idx >= 0) {
+      sec.items[idx] = itemData;
+    } else {
+      sec.items.push(itemData);
+    }
+
+    formItemContainer.style.display = 'none';
+    btnShowAddItem.style.display = 'inline-flex';
+    saveData();
+  });
+
+  function renderAdminSectionsList() {
+    const container = document.getElementById('admin-sections-list');
+    container.innerHTML = AppData.sections.map((sec, idx) => '<div class="admin-item-card">' +
+      '<div class="admin-item-info">' +
+        '<div class="admin-item-title">' + sec.title + ' <span style="font-size:11px; color:var(--muted);">(' + sec.items.length + ' item)</span></div>' +
+      '</div>' +
+      '<div class="admin-item-actions">' +
+        '<button class="btn-admin btn-admin-danger" onclick="deleteSection(' + idx + ')" style="padding:6px 10px; font-size:11px;">Hapus</button>' +
+      '</div>' +
+    '</div>').join('');
+  }
+
+  document.getElementById('btn-add-section').addEventListener('click', () => {
+    const name = document.getElementById('new-section-name').value.trim();
+    if (!name) return alert('Nama section wajib diisi!');
+    const id = 'sec_' + Date.now();
+    AppData.sections.push({
+      id: id,
+      title: name,
+      label: name,
+      items: []
+    });
+    document.getElementById('new-section-name').value = '';
+    saveData();
+  });
+
+  window.deleteSection = function(idx) {
+    if (AppData.sections.length <= 1) return alert('Minimal harus ada 1 section!');
+    if (!confirm('Hapus section "' + AppData.sections[idx].title + '" beserta isinya?')) return;
+    AppData.sections.splice(idx, 1);
+    saveData();
+  };
+
+  document.getElementById('btn-save-profile').addEventListener('click', () => {
+    AppData.profile.name = document.getElementById('prof-name').value.trim();
+    AppData.profile.tagline = document.getElementById('prof-tagline').value.trim();
+    AppData.profile.bio = document.getElementById('prof-bio').value.trim();
+    saveData();
+    alert('Profil berhasil diupdate!');
+  });
+
+  document.getElementById('btn-copy-backup').addEventListener('click', () => {
+    navigator.clipboard.writeText(JSON.stringify(AppData, null, 2));
+    alert('Data JSON berhasil disalin!');
+  });
+
+  document.getElementById('btn-reset-default').addEventListener('click', () => {
+    if (!confirm('Yakin nak reset semua data ke pengaturan awal?')) return;
+    AppData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    saveData();
+    alert('Data berhasil di-reset!');
+  });
+
+  renderApp();
 </script>
+
 </body>
 </html>
