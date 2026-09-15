@@ -509,107 +509,7 @@
     youtube: '<svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>'
   };
 
-  const DEFAULT_DATA = {
-    profile: {
-      name: "JadiLebihFit",
-      tagline: "Fitness Coach & Health Creator",
-      bio: "Bantu kau hidup lebih sehat, lebih kuat, dan lebih percaya diri — dari latihan sampai pola makan. Mantap kali, kan?"
-    },
-    socials: {
-      instagram: "https://instagram.com/jadilebihfit",
-      whatsapp: "https://wa.me/6285286535908",
-      tiktok: "https://www.tiktok.com/@jadilebihfit",
-      youtube: "https://www.youtube.com/@jadilebihfit"
-    },
-    sections: [
-      {
-        id: "collab",
-        title: "Kolaborasi",
-        label: "Endorsement & Kerjasama",
-        items: [
-          {
-            title: "Endorsement & Kerjasama",
-            subtitle: "Chat bang, jangan segan-segan",
-            url: "https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20tertarik%20nak%20kerja%20sama%20atau%20endorse%20sama%20JadiLebihFit.%20Ini%20detail%20aku%20bang%3A%0A%0ANama%20Brand%2FProduk%3A%20%5Bisi%20di%20sini%5D%0AJenis%20Kerja%20Sama%3A%20%5BEndorsement%20%2F%20Paid%20Promote%20%2F%20Affiliate%20%2F%20Lainnya%5D%0AProduk%2FLayanan%3A%20%5Bceritain%20singkat%20bang%5D%0ATimeline%3A%20%5Bkapan%20dibutuhkan%5D%0ABudget%3A%20%5Bjika%20ada%5D%0A%0AMakasih%20bang%2C%20ditunggu%20ya!",
-            badge: "WhatsApp",
-            style: "gold",
-            icon: "wa"
-          }
-        ]
-      },
-      {
-        id: "coaching",
-        title: "Coaching",
-        label: "Program Coaching",
-        items: [
-          {
-            title: "Coaching Online",
-            subtitle: "Program personal dari mana pun kau berada",
-            url: "https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20mau%20daftar%20Coaching%20Online%20JadiLebihFit.%20Ini%20info%20aku%20bang%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20naik%20massa%20otot%5D%0APreferensi%3A%20Online%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0AMantap%20kali%20bang%2C%20makasih!",
-            badge: "Virtual",
-            style: "blue",
-            icon: "screen"
-          },
-          {
-            title: "Coaching Offline",
-            subtitle: "Latihan langsung sama bang coach",
-            url: "https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20mau%20daftar%20Coaching%20Offline%20JadiLebihFit.%20Ini%20info%20aku%20bang%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20naik%20massa%20otot%5D%0ALokasi%3A%20%5Bkota%20%2F%20gym%20mana%20bang%5D%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0AMantap%20kali%20bang%2C%20makasih!",
-            badge: "Tatap Muka",
-            style: "gold",
-            icon: "dumbbell"
-          }
-        ]
-      },
-      {
-        id: "tools",
-        title: "Tools",
-        label: "Bantu Progres Kau",
-        items: [
-          {
-            title: "Hitung Kalori & Makro",
-            subtitle: "Tau berapa yang kau perlu makan",
-            url: "https://tools.jadilebihfit.xyz",
-            badge: "Gratis",
-            style: "gold",
-            icon: "chart"
-          },
-          {
-            title: "Cek BMI & Berat Ideal",
-            subtitle: "Tau posisi kau sekarang di mana",
-            url: "https://tools.jadilebihfit.xyz",
-            badge: "Gratis",
-            style: "gold",
-            icon: "clock"
-          },
-          {
-            title: "Semua Tools Fitness",
-            subtitle: "Lengkap, gratis, dan mantap kali",
-            url: "https://tools.jadilebihfit.xyz",
-            badge: "LebihFit",
-            style: "blue",
-            icon: "pulse"
-          }
-        ]
-      },
-      {
-        id: "stori",
-        title: "Stori",
-        label: "Perjalanan Saya",
-        items: [
-          {
-            title: "Stori JadiLebihFit",
-            subtitle: "Kisah nyata di balik transformasi aku",
-            url: "https://stori.jadilebihfit.xyz",
-            badge: "Perjalanan",
-            style: "gold",
-            icon: "eye"
-          }
-        ]
-      }
-    ]
-  };
-
-  const AppData = JSON.parse(localStorage.getItem('jadilebihfit_data')) || DEFAULT_DATA;
+  let AppData = {"profile":{"name":"JadiLebihFit","tagline":"Fitness Coach & Health Creator","bio":"Bantu kau hidup lebih sehat, lebih kuat, dan lebih percaya diri — dari latihan sampai pola makan. Mantap kali, kan?"},"socials":{"instagram":"https://instagram.com/jadilebihfit","whatsapp":"https://wa.me/6285286535908","tiktok":"https://www.tiktok.com/@jadilebihfit","youtube":"https://www.youtube.com/@jadilebihfit"},"sections":[{"id":"collab","title":"Kolaborasi","label":"Endorsement & Kerjasama","items":[{"title":"Endorsement & Kerjasama","subtitle":"Chat bang, jangan segan-segan","url":"https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20tertarik%20nak%20kerja%20sama%20atau%20endorse%20sama%20JadiLebihFit.%20Ini%20detail%20aku%20bang%3A%0A%0ANama%20Brand%2FProduk%3A%20%5Bisi%20di%20sini%5D%0AJenis%20Kerja%20Sama%3A%20%5BEndorsement%20%2F%20Paid%20Promote%20%2F%20Affiliate%20%2F%20Lainnya%5D%0AProduk%2FLayanan%3A%20%5Bceritain%20singkat%20bang%5D%0ATimeline%3A%20%5Bkapan%20dibutuhkan%5D%0ABudget%3A%20%5Bjika%20ada%5D%0A%0AMakasih%20bang%2C%20ditunggu%20ya!","badge":"WhatsApp","style":"gold","icon":"wa"}]},{"id":"coaching","title":"Coaching","label":"Program Coaching","items":[{"title":"Coaching Online","subtitle":"Program personal dari mana pun kau berada","url":"https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20mau%20daftar%20Coaching%20Online%20JadiLebihFit.%20Ini%20info%20aku%20bang%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20naik%20massa%20otot%5D%0APreferensi%3A%20Online%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0AMantap%20kali%20bang%2C%20makasih!","badge":"Virtual","style":"blue","icon":"screen"},{"title":"Coaching Offline","subtitle":"Latihan langsung sama bang coach","url":"https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20mau%20daftar%20Coaching%20Offline%20JadiLebihFit.%20Ini%20info%20aku%20bang%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20naik%20massa%20otot%5D%0ALokasi%3A%20%5Bkota%20%2F%20gym%20mana%20bang%5D%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0AMantap%20kali%20bang%2C%20makasih!","badge":"Tatap Muka","style":"gold","icon":"dumbbell"}]},{"id":"tools","title":"Tools","label":"Bantu Progres Kau","items":[{"title":"Hitung Kalori & Makro","subtitle":"Tau berapa yang kau perlu makan","url":"https://tools.jadilebihfit.xyz","badge":"Gratis","style":"gold","icon":"chart"},{"title":"Cek BMI & Berat Ideal","subtitle":"Tau posisi kau sekarang di mana","url":"https://tools.jadilebihfit.xyz","badge":"Gratis","style":"gold","icon":"clock"},{"title":"Semua Tools Fitness","subtitle":"Lengkap, gratis, dan mantap kali","url":"https://tools.jadilebihfit.xyz","badge":"LebihFit","style":"blue","icon":"pulse"}]},{"id":"stori","title":"Stori","label":"Perjalanan Saya","items":[{"title":"Stori JadiLebihFit","subtitle":"Kisah nyata di balik transformasi aku","url":"https://stori.jadilebihfit.xyz","badge":"Perjalanan","style":"gold","icon":"eye"}]}]};
 
   function renderApp() {
     document.getElementById('ui-name').textContent = AppData.profile.name;
@@ -658,7 +558,6 @@
       '</div>';
     }).join('');
 
-    // Render Socials
     if (AppData.socials) {
       socialsContainer.innerHTML = Object.entries(AppData.socials).map(([key, url]) => {
         if (!url) return '';
@@ -667,7 +566,6 @@
       }).join('');
     }
 
-    // Tab interaction
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.tab-btn').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
@@ -678,7 +576,6 @@
       });
     });
 
-    // Ripple effect
     document.querySelectorAll('.link-card').forEach(card => {
       card.addEventListener('click', function(e) {
         const r = document.createElement('span');
@@ -692,7 +589,15 @@
     });
   }
 
-  renderApp();
+  // Live Fetch with fallback to localStorage / embedded data
+  fetch('data.json?t=' + Date.now())
+    .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+    .then(data => { AppData = data; renderApp(); })
+    .catch(() => {
+      const local = localStorage.getItem('jadilebihfit_data');
+      if (local) { AppData = JSON.parse(local); }
+      renderApp();
+    });
 </script>
 
 </body>

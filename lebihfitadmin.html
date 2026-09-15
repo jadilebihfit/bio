@@ -61,6 +61,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
     }
     .admin-header h1 {
       font-size: 18px;
@@ -68,21 +70,39 @@
       letter-spacing: -0.3px;
     }
 
+    .header-actions { display: flex; gap: 8px; align-items: center; }
+
     .btn-preview {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 7px 12px;
+      padding: 8px 12px;
       border-radius: 8px;
-      background: hsl(var(--gold) / .15);
-      border: 1px solid hsl(var(--gold) / .35);
-      color: hsl(var(--gold-light));
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
       text-decoration: none;
       font-size: 12px;
       font-weight: 600;
-      transition: background 0.2s, transform 0.15s;
+      transition: background 0.2s;
     }
-    .btn-preview:hover { background: hsl(var(--gold) / .25); transform: translateY(-1px); }
+    .btn-preview:hover { background: hsl(40 8% 18%); }
+
+    .btn-publish {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: linear-gradient(180deg, hsl(46 82% 62%), hsl(42 72% 46%));
+      color: hsl(40 40% 8%);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-publish:hover { opacity: 0.92; transform: translateY(-1px); }
 
     .admin-tabs {
       display: flex;
@@ -122,6 +142,18 @@
 
     .admin-panel { display: none; flex-direction: column; gap: 16px; }
     .admin-panel.active { display: flex; }
+
+    .status-toast {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-toast.success { display: flex; background: rgba(52, 199, 89, 0.15); border: 1px solid rgba(52, 199, 89, 0.35); color: #34c759; }
+    .status-toast.error { display: flex; background: rgba(255, 69, 58, 0.15); border: 1px solid rgba(255, 69, 58, 0.35); color: #ff453a; }
+    .status-toast.info { display: flex; background: rgba(10, 132, 255, 0.15); border: 1px solid rgba(10, 132, 255, 0.35); color: #0a84ff; }
 
     .form-group {
       display: flex;
@@ -219,16 +251,25 @@
       <h1 class="gold-grad">JadiLebihFit Admin</h1>
       <p style="font-size:12px; color:var(--muted); margin-top:2px;">Kelola Menu, Section, Profil &amp; Sosmed</p>
     </div>
-    <a href="index.html" target="_blank" class="btn-preview">
-      Lihat Halaman Bio &rarr;
-    </a>
+    <div class="header-actions">
+      <a href="index.html" target="_blank" class="btn-preview">
+        Lihat Halaman Bio &rarr;
+      </a>
+      <button class="btn-publish" id="btn-header-publish">
+        Publish ke Web
+      </button>
+    </div>
   </div>
+
+  <!-- Notification Toast -->
+  <div id="status-toast" class="status-toast"></div>
 
   <div class="admin-tabs">
     <button class="admin-tab active" data-target="tab-items">Kelola Menu &amp; Link</button>
     <button class="admin-tab" data-target="tab-sections">Kelola Section</button>
     <button class="admin-tab" data-target="tab-socials">Link Sosmed</button>
     <button class="admin-tab" data-target="tab-profile">Edit Profil</button>
+    <button class="admin-tab" data-target="tab-github">GitHub Auto-Sync</button>
     <button class="admin-tab" data-target="tab-export">Backup &amp; Reset</button>
   </div>
 
@@ -346,7 +387,38 @@
       <button class="btn btn-gold" id="btn-save-profile">Simpan Profil</button>
     </div>
 
-    <!-- 5. BACKUP / RESET -->
+    <!-- 5. GITHUB AUTO-SYNC -->
+    <div class="admin-panel" id="tab-github">
+      <div style="background:hsl(36 8% 7%); border:1px solid var(--border); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:12px;">
+        <h3 style="font-size:14px; color:hsl(var(--gold-light));">Pengaturan GitHub Auto-Sync</h3>
+        <p style="font-size:12px; color:var(--muted); line-height:1.5;">Masukkan GitHub Personal Access Token lo sekali saja. Token ini disimpan aman di browser lo dan digunakan untuk langsung mengupdate website secara live ke seluruh dunia setiap kali lo klik "Publish ke Web".</p>
+        
+        <div class="form-group">
+          <label>GitHub Personal Access Token (PAT)</label>
+          <input type="password" class="form-control" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>Repository Owner / Username</label>
+            <input type="text" class="form-control" id="gh-owner" value="jadilebihfit" />
+          </div>
+          <div class="form-group">
+            <label>Repository Name</label>
+            <input type="text" class="form-control" id="gh-repo" value="bio" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Branch</label>
+          <input type="text" class="form-control" id="gh-branch" value="main" />
+        </div>
+
+        <button class="btn btn-gold" id="btn-save-gh-config">Simpan Pengaturan Token</button>
+      </div>
+    </div>
+
+    <!-- 6. BACKUP / RESET -->
     <div class="admin-panel" id="tab-export">
       <p style="font-size:12px; color:var(--muted); line-height:1.5;">Data tersimpan otomatis di browser ini. Lo bisa salin format JSON untuk backup kapan saja:</p>
       <textarea class="form-control" id="backup-box" readonly style="font-size:11px; font-family:monospace; min-height:130px;"></textarea>
@@ -360,112 +432,91 @@
 </div>
 
 <script>
-  const DEFAULT_DATA = {
-    profile: {
-      name: "JadiLebihFit",
-      tagline: "Fitness Coach & Health Creator",
-      bio: "Bantu kau hidup lebih sehat, lebih kuat, dan lebih percaya diri — dari latihan sampai pola makan. Mantap kali, kan?"
-    },
-    socials: {
-      instagram: "https://instagram.com/jadilebihfit",
-      whatsapp: "https://wa.me/6285286535908",
-      tiktok: "https://www.tiktok.com/@jadilebihfit",
-      youtube: "https://www.youtube.com/@jadilebihfit"
-    },
-    sections: [
-      {
-        id: "collab",
-        title: "Kolaborasi",
-        label: "Endorsement & Kerjasama",
-        items: [
-          {
-            title: "Endorsement & Kerjasama",
-            subtitle: "Chat bang, jangan segan-segan",
-            url: "https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20tertarik%20nak%20kerja%20sama%20atau%20endorse%20sama%20JadiLebihFit.%20Ini%20detail%20aku%20bang%3A%0A%0ANama%20Brand%2FProduk%3A%20%5Bisi%20di%20sini%5D%0AJenis%20Kerja%20Sama%3A%20%5BEndorsement%20%2F%20Paid%20Promote%20%2F%20Affiliate%20%2F%20Lainnya%5D%0AProduk%2FLayanan%3A%20%5Bceritain%20singkat%20bang%5D%0ATimeline%3A%20%5Bkapan%20dibutuhkan%5D%0ABudget%3A%20%5Bjika%20ada%5D%0A%0AMakasih%20bang%2C%20ditunggu%20ya!",
-            badge: "WhatsApp",
-            style: "gold",
-            icon: "wa"
-          }
-        ]
-      },
-      {
-        id: "coaching",
-        title: "Coaching",
-        label: "Program Coaching",
-        items: [
-          {
-            title: "Coaching Online",
-            subtitle: "Program personal dari mana pun kau berada",
-            url: "https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20mau%20daftar%20Coaching%20Online%20JadiLebihFit.%20Ini%20info%20aku%20bang%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20naik%20massa%20otot%5D%0APreferensi%3A%20Online%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0AMantap%20kali%20bang%2C%20makasih!",
-            badge: "Virtual",
-            style: "blue",
-            icon: "screen"
-          },
-          {
-            title: "Coaching Offline",
-            subtitle: "Latihan langsung sama bang coach",
-            url: "https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20mau%20daftar%20Coaching%20Offline%20JadiLebihFit.%20Ini%20info%20aku%20bang%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20naik%20massa%20otot%5D%0ALokasi%3A%20%5Bkota%20%2F%20gym%20mana%20bang%5D%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0AMantap%20kali%20bang%2C%20makasih!",
-            badge: "Tatap Muka",
-            style: "gold",
-            icon: "dumbbell"
-          }
-        ]
-      },
-      {
-        id: "tools",
-        title: "Tools",
-        label: "Bantu Progres Kau",
-        items: [
-          {
-            title: "Hitung Kalori & Makro",
-            subtitle: "Tau berapa yang kau perlu makan",
-            url: "https://tools.jadilebihfit.xyz",
-            badge: "Gratis",
-            style: "gold",
-            icon: "chart"
-          },
-          {
-            title: "Cek BMI & Berat Ideal",
-            subtitle: "Tau posisi kau sekarang di mana",
-            url: "https://tools.jadilebihfit.xyz",
-            badge: "Gratis",
-            style: "gold",
-            icon: "clock"
-          },
-          {
-            title: "Semua Tools Fitness",
-            subtitle: "Lengkap, gratis, dan mantap kali",
-            url: "https://tools.jadilebihfit.xyz",
-            badge: "LebihFit",
-            style: "blue",
-            icon: "pulse"
-          }
-        ]
-      },
-      {
-        id: "stori",
-        title: "Stori",
-        label: "Perjalanan Saya",
-        items: [
-          {
-            title: "Stori JadiLebihFit",
-            subtitle: "Kisah nyata di balik transformasi aku",
-            url: "https://stori.jadilebihfit.xyz",
-            badge: "Perjalanan",
-            style: "gold",
-            icon: "eye"
-          }
-        ]
-      }
-    ]
-  };
+  let AppData = {"profile":{"name":"JadiLebihFit","tagline":"Fitness Coach & Health Creator","bio":"Bantu kau hidup lebih sehat, lebih kuat, dan lebih percaya diri — dari latihan sampai pola makan. Mantap kali, kan?"},"socials":{"instagram":"https://instagram.com/jadilebihfit","whatsapp":"https://wa.me/6285286535908","tiktok":"https://www.tiktok.com/@jadilebihfit","youtube":"https://www.youtube.com/@jadilebihfit"},"sections":[{"id":"collab","title":"Kolaborasi","label":"Endorsement & Kerjasama","items":[{"title":"Endorsement & Kerjasama","subtitle":"Chat bang, jangan segan-segan","url":"https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20tertarik%20nak%20kerja%20sama%20atau%20endorse%20sama%20JadiLebihFit.%20Ini%20detail%20aku%20bang%3A%0A%0ANama%20Brand%2FProduk%3A%20%5Bisi%20di%20sini%5D%0AJenis%20Kerja%20Sama%3A%20%5BEndorsement%20%2F%20Paid%20Promote%20%2F%20Affiliate%20%2F%20Lainnya%5D%0AProduk%2FLayanan%3A%20%5Bceritain%20singkat%20bang%5D%0ATimeline%3A%20%5Bkapan%20dibutuhkan%5D%0ABudget%3A%20%5Bjika%20ada%5D%0A%0AMakasih%20bang%2C%20ditunggu%20ya!","badge":"WhatsApp","style":"gold","icon":"wa"}]},{"id":"coaching","title":"Coaching","label":"Program Coaching","items":[{"title":"Coaching Online","subtitle":"Program personal dari mana pun kau berada","url":"https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20mau%20daftar%20Coaching%20Online%20JadiLebihFit.%20Ini%20info%20aku%20bang%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20naik%20massa%20otot%5D%0APreferensi%3A%20Online%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0AMantap%20kali%20bang%2C%20makasih!","badge":"Virtual","style":"blue","icon":"screen"},{"title":"Coaching Offline","subtitle":"Latihan langsung sama bang coach","url":"https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20mau%20daftar%20Coaching%20Offline%20JadiLebihFit.%20Ini%20info%20aku%20bang%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20naik%20massa%20otot%5D%0ALokasi%3A%20%5Bkota%20%2F%20gym%20mana%20bang%5D%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0AMantap%20kali%20bang%2C%20makasih!","badge":"Tatap Muka","style":"gold","icon":"dumbbell"}]},{"id":"tools","title":"Tools","label":"Bantu Progres Kau","items":[{"title":"Hitung Kalori & Makro","subtitle":"Tau berapa yang kau perlu makan","url":"https://tools.jadilebihfit.xyz","badge":"Gratis","style":"gold","icon":"chart"},{"title":"Cek BMI & Berat Ideal","subtitle":"Tau posisi kau sekarang di mana","url":"https://tools.jadilebihfit.xyz","badge":"Gratis","style":"gold","icon":"clock"},{"title":"Semua Tools Fitness","subtitle":"Lengkap, gratis, dan mantap kali","url":"https://tools.jadilebihfit.xyz","badge":"LebihFit","style":"blue","icon":"pulse"}]},{"id":"stori","title":"Stori","label":"Perjalanan Saya","items":[{"title":"Stori JadiLebihFit","subtitle":"Kisah nyata di balik transformasi aku","url":"https://stori.jadilebihfit.xyz","badge":"Perjalanan","style":"gold","icon":"eye"}]}]};
 
-  let AppData = JSON.parse(localStorage.getItem('jadilebihfit_data')) || DEFAULT_DATA;
+  // Load from data.json first, then fallback to localStorage
+  fetch('data.json?t=' + Date.now())
+    .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+    .then(data => { AppData = data; render(); })
+    .catch(() => {
+      const local = localStorage.getItem('jadilebihfit_data');
+      if (local) { AppData = JSON.parse(local); }
+      render();
+    });
 
-  function save() {
+  function saveLocal() {
     localStorage.setItem('jadilebihfit_data', JSON.stringify(AppData));
     render();
   }
+
+  function showToast(msg, type = 'success') {
+    const toast = document.getElementById('status-toast');
+    toast.className = 'status-toast ' + type;
+    toast.textContent = msg;
+    toast.style.display = 'flex';
+    setTimeout(() => { toast.style.display = 'none'; }, 4000);
+  }
+
+  // GitHub Auto-Publish Function
+  async function publishToGitHub() {
+    const token = localStorage.getItem('gh_token') || document.getElementById('gh-token').value.trim();
+    const owner = localStorage.getItem('gh_owner') || document.getElementById('gh-owner').value.trim() || 'jadilebihfit';
+    const repo = localStorage.getItem('gh_repo') || document.getElementById('gh-repo').value.trim() || 'bio';
+    const branch = localStorage.getItem('gh_branch') || document.getElementById('gh-branch').value.trim() || 'main';
+
+    if (!token) {
+      showToast('Masukkan GitHub Token di tab "GitHub Auto-Sync" terlebih dahulu!', 'error');
+      document.querySelector('[data-target="tab-github"]').click();
+      return;
+    }
+
+    showToast('Sedang mengirim update ke GitHub...', 'info');
+
+    try {
+      // 1. Get current data.json sha
+      const fileUrl = 'https://api.github.com/repos/' + owner + '/' + repo + '/contents/data.json?ref=' + branch;
+      let sha = '';
+      const getRes = await fetch(fileUrl, {
+        headers: {
+          'Authorization': 'token ' + token,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+      if (getRes.ok) {
+        const fileInfo = await getRes.json();
+        sha = fileInfo.sha;
+      }
+
+      // 2. Put updated data.json
+      const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(AppData, null, 2))));
+      const putRes = await fetch(fileUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'token ' + token,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: 'feat: update bio data from admin dashboard',
+          content: contentBase64,
+          sha: sha || undefined,
+          branch: branch
+        })
+      });
+
+      if (!putRes.ok) {
+        const errData = await putRes.json();
+        throw new Error(errData.message || 'Gagal push ke GitHub');
+      }
+
+      saveLocal();
+      showToast('Perubahan berhasil di-publish ke GitHub! Live dalam 5 detik.', 'success');
+    } catch (err) {
+      showToast('Gagal publish: ' + err.message, 'error');
+    }
+  }
+
+  document.getElementById('btn-header-publish').addEventListener('click', publishToGitHub);
 
   // Tab switching
   document.querySelectorAll('.admin-tab').forEach(tab => {
@@ -478,7 +529,6 @@
   });
 
   function render() {
-    // 1. Populate Section Selector
     const secSelect = document.getElementById('select-section');
     const curVal = secSelect.value;
     secSelect.innerHTML = AppData.sections.map(s => '<option value="' + s.id + '">' + s.title + '</option>').join('');
@@ -487,19 +537,21 @@
     renderItemsList();
     renderSectionsList();
 
-    // 2. Profile
     document.getElementById('prof-name').value = AppData.profile.name || '';
     document.getElementById('prof-tagline').value = AppData.profile.tagline || '';
     document.getElementById('prof-bio').value = AppData.profile.bio || '';
 
-    // 3. Socials
     const soc = AppData.socials || {};
     document.getElementById('soc-instagram').value = soc.instagram || '';
     document.getElementById('soc-whatsapp').value = soc.whatsapp || '';
     document.getElementById('soc-tiktok').value = soc.tiktok || '';
     document.getElementById('soc-youtube').value = soc.youtube || '';
 
-    // 4. Backup
+    document.getElementById('gh-token').value = localStorage.getItem('gh_token') || '';
+    document.getElementById('gh-owner').value = localStorage.getItem('gh_owner') || 'jadilebihfit';
+    document.getElementById('gh-repo').value = localStorage.getItem('gh_repo') || 'bio';
+    document.getElementById('gh-branch').value = localStorage.getItem('gh_branch') || 'main';
+
     document.getElementById('backup-box').value = JSON.stringify(AppData, null, 2);
   }
 
@@ -571,7 +623,8 @@
     const secId = document.getElementById('select-section').value;
     const sec = AppData.sections.find(s => s.id === secId);
     sec.items.splice(idx, 1);
-    save();
+    saveLocal();
+    showToast('Item berhasil dihapus.');
   };
 
   document.getElementById('btn-save-item').addEventListener('click', () => {
@@ -599,7 +652,8 @@
 
     formBox.style.display = 'none';
     btnShowAdd.style.display = 'inline-flex';
-    save();
+    saveLocal();
+    showToast('Item berhasil disimpan! Klik "Publish ke Web" untuk mengaktifkan ke semua orang.');
   });
 
   function renderSectionsList() {
@@ -624,14 +678,16 @@
       items: []
     });
     document.getElementById('new-section-input').value = '';
-    save();
+    saveLocal();
+    showToast('Section baru ditambahkan!');
   });
 
   window.deleteSection = function(idx) {
     if (AppData.sections.length <= 1) return alert('Minimal harus ada 1 section!');
     if (!confirm('Hapus section "' + AppData.sections[idx].title + '" beserta isinya?')) return;
     AppData.sections.splice(idx, 1);
-    save();
+    saveLocal();
+    showToast('Section berhasil dihapus.');
   };
 
   document.getElementById('btn-save-socials').addEventListener('click', () => {
@@ -641,8 +697,8 @@
       tiktok: document.getElementById('soc-tiktok').value.trim(),
       youtube: document.getElementById('soc-youtube').value.trim()
     };
-    save();
-    alert('Link media sosial berhasil disimpan!');
+    saveLocal();
+    showToast('Link sosmed berhasil disimpan!');
   });
 
   document.getElementById('btn-save-profile').addEventListener('click', () => {
@@ -651,20 +707,30 @@
       tagline: document.getElementById('prof-tagline').value.trim(),
       bio: document.getElementById('prof-bio').value.trim()
     };
-    save();
-    alert('Profil berhasil disimpan!');
+    saveLocal();
+    showToast('Profil berhasil disimpan!');
+  });
+
+  document.getElementById('btn-save-gh-config').addEventListener('click', () => {
+    const token = document.getElementById('gh-token').value.trim();
+    if (!token) return alert('Masukkan token GitHub!');
+    localStorage.setItem('gh_token', token);
+    localStorage.setItem('gh_owner', document.getElementById('gh-owner').value.trim() || 'jadilebihfit');
+    localStorage.setItem('gh_repo', document.getElementById('gh-repo').value.trim() || 'bio');
+    localStorage.setItem('gh_branch', document.getElementById('gh-branch').value.trim() || 'main');
+    showToast('Pengaturan GitHub Token berhasil disimpan di browser ini!');
   });
 
   document.getElementById('btn-copy-backup').addEventListener('click', () => {
     navigator.clipboard.writeText(JSON.stringify(AppData, null, 2));
-    alert('Data JSON berhasil disalin!');
+    showToast('Data JSON berhasil disalin!');
   });
 
   document.getElementById('btn-reset').addEventListener('click', () => {
     if (!confirm('Yakin nak reset semua data ke pengaturan awal?')) return;
     AppData = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    save();
-    alert('Data berhasil di-reset!');
+    saveLocal();
+    showToast('Data berhasil di-reset!');
   });
 
   render();
