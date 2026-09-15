@@ -6,7 +6,6 @@
   <meta name="theme-color" content="#0f0e0c" />
   <title>JadiLebihFit</title>
   <style>
-    /* ── Design tokens (gold luxury dark — inspired by pakarpajak.id) ── */
     :root {
       --bg:            #0f0e0c;
       --surface:       hsl(36 8% 9%);
@@ -35,7 +34,6 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Ambient glow bg ── */
     body::before {
       content: "";
       position: fixed;
@@ -57,7 +55,6 @@
     }
     @media (prefers-reduced-motion: reduce) { body::before { animation: none; } }
 
-    /* ── Gold gradient text util ── */
     .gold-grad {
       background: linear-gradient(100deg,
         hsl(40 68% 46%) 0%,
@@ -70,7 +67,6 @@
       -webkit-text-fill-color: transparent; color: transparent;
     }
 
-    /* ── Wrapper ── */
     .wrapper {
       position: relative;
       z-index: 1;
@@ -82,7 +78,6 @@
       align-items: center;
     }
 
-    /* ── Profile ── */
     .profile {
       display: flex;
       flex-direction: column;
@@ -135,7 +130,6 @@
       max-width: 320px;
     }
 
-    /* ── Tab wrapper & hint ── */
     .tabs-wrapper {
       width: 100%;
       margin-bottom: 16px;
@@ -160,7 +154,6 @@
       50%       { opacity: 1; }
     }
 
-    /* ── Tab bar ── */
     .tabs {
       width: 100%;
       display: flex;
@@ -196,7 +189,6 @@
       white-space: nowrap;
     }
 
-    /* shimmer sweep on inactive tabs */
     .tab-btn:not(.active)::before {
       content: "";
       position: absolute;
@@ -224,7 +216,6 @@
       100% { transform: translateX(100%); opacity: 0; }
     }
 
-    /* pulsing gold outline on inactive tabs */
     .tab-btn:not(.active) {
       animation: tabGlow 3s ease-in-out infinite;
     }
@@ -255,7 +246,6 @@
     }
     .tab-btn.active::before { display: none; }
 
-    /* ── Tab panels container ── */
     #panels-container { width: 100%; }
 
     .panel { display: none; width: 100%; flex-direction: column; gap: 10px; }
@@ -265,7 +255,6 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── Section label ── */
     .section-label {
       font-size: 10.5px;
       font-weight: 700;
@@ -277,7 +266,6 @@
       padding-left: 2px;
     }
 
-    /* ── Link cards ── */
     .link-card {
       display: flex;
       align-items: center;
@@ -401,7 +389,6 @@
       color: hsl(var(--gold-light));
     }
 
-    /* ── Social row ── */
     .social-row {
       display: flex;
       justify-content: center;
@@ -434,7 +421,6 @@
 
     .social-btn svg { width: 17px; height: 17px; fill: currentColor; }
 
-    /* ── Divider & Footer ── */
     .divider {
       width: 100%;
       height: 1px;
@@ -450,7 +436,6 @@
       text-align: center;
     }
 
-    /* ── Ripple ── */
     @keyframes ripple { to { transform: scale(4); opacity: 0; } }
     .ripple-fx {
       position: absolute;
@@ -461,213 +446,6 @@
       animation: ripple 0.5s linear;
       pointer-events: none;
     }
-
-    /* ════════════════════════════════════════════════
-       ADMIN TRIGGER & MODAL STYLES
-       ════════════════════════════════════════════════ */
-    .admin-float-btn {
-      position: fixed;
-      bottom: 18px;
-      right: 18px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: var(--surface);
-      border: 1px solid hsl(var(--gold) / .35);
-      color: hsl(var(--gold-light));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 99;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 15px hsl(var(--gold) / .2);
-      transition: transform 0.2s, background 0.2s, border-color 0.2s;
-    }
-    .admin-float-btn:hover {
-      transform: scale(1.1) rotate(30deg);
-      background: var(--surface2);
-      border-color: hsl(var(--gold));
-    }
-    .admin-float-btn svg { width: 20px; height: 20px; }
-
-    /* Admin Modal Backdrop */
-    .admin-modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(10px);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      animation: fadeIn 0.2s ease;
-    }
-    .admin-modal-backdrop.open { display: flex; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-    .admin-modal {
-      width: 100%;
-      max-width: 520px;
-      max-height: 90vh;
-      background: hsl(36 8% 10%);
-      border: 1px solid hsl(var(--gold) / .35);
-      border-radius: 16px;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.9), 0 0 40px hsl(var(--gold) / .15);
-      overflow: hidden;
-      color: var(--text);
-    }
-
-    .admin-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: hsl(36 8% 8%);
-    }
-    .admin-header h2 {
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.2px;
-      color: hsl(var(--gold-light));
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .admin-close {
-      background: transparent;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 20px;
-      padding: 4px;
-      line-height: 1;
-      transition: color 0.2s;
-    }
-    .admin-close:hover { color: #fff; }
-
-    /* Admin Navigation Tabs */
-    .admin-nav {
-      display: flex;
-      background: hsl(36 8% 7%);
-      border-bottom: 1px solid var(--border);
-      padding: 4px;
-      gap: 4px;
-      overflow-x: auto;
-    }
-    .admin-nav-btn {
-      flex: 1;
-      padding: 8px 10px;
-      border: none;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      background: transparent;
-      color: var(--muted);
-      transition: background 0.2s, color 0.2s;
-      white-space: nowrap;
-    }
-    .admin-nav-btn.active {
-      background: hsl(var(--gold) / .15);
-      color: hsl(var(--gold-light));
-      border: 1px solid hsl(var(--gold) / .3);
-    }
-
-    .admin-body {
-      padding: 20px;
-      overflow-y: auto;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .admin-view { display: none; flex-direction: column; gap: 14px; }
-    .admin-view.active { display: flex; }
-
-    /* Form controls */
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .form-group label {
-      font-size: 11.5px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      color: hsl(var(--gold-light));
-    }
-    .form-control {
-      width: 100%;
-      padding: 10px 12px;
-      background: hsl(36 8% 7%);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-family: var(--font);
-      font-size: 13.5px;
-      transition: border-color 0.2s;
-    }
-    .form-control:focus {
-      outline: none;
-      border-color: hsl(var(--gold));
-    }
-    textarea.form-control { min-height: 70px; resize: vertical; }
-
-    /* Action Buttons */
-    .btn-admin {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 9px 14px;
-      border-radius: 8px;
-      font-family: var(--font);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: transform 0.15s, opacity 0.2s, background 0.2s;
-    }
-    .btn-admin-primary {
-      background: linear-gradient(180deg, hsl(46 82% 62%), hsl(42 72% 46%));
-      color: hsl(40 40% 8%);
-    }
-    .btn-admin-primary:hover { opacity: 0.92; transform: translateY(-1px); }
-    .btn-admin-danger {
-      background: rgba(255, 69, 58, 0.15);
-      border: 1px solid rgba(255, 69, 58, 0.35);
-      color: #ff453a;
-    }
-    .btn-admin-danger:hover { background: rgba(255, 69, 58, 0.25); }
-    .btn-admin-secondary {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text);
-    }
-    .btn-admin-secondary:hover { background: hsl(40 8% 18%); }
-
-    /* Admin List Items */
-    .admin-item-card {
-      background: hsl(36 8% 8%);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .admin-item-card:hover { border-color: hsl(var(--gold) / .3); }
-    .admin-item-info { flex: 1; min-width: 0; }
-    .admin-item-title { font-size: 13.5px; font-weight: 600; color: var(--text); }
-    .admin-item-sub { font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .admin-item-actions { display: flex; gap: 6px; }
 
     @media (min-width: 520px) {
       .wrapper    { padding-top: 76px; }
@@ -690,174 +468,26 @@
     <p class="bio" id="ui-bio">Bantu kau hidup lebih sehat, lebih kuat, dan lebih percaya diri — dari latihan sampai pola makan. Mantap kali, kan?</p>
   </div>
 
-  <!-- Dynamic Tabs -->
+  <!-- Tabs -->
   <div class="tabs-wrapper">
     <p class="tabs-hint">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       Pilih kategori di bawah ini
     </p>
-    <div class="tabs" id="ui-tabs" role="tablist">
-      <!-- Generated by JS -->
-    </div>
+    <div class="tabs" id="ui-tabs" role="tablist"></div>
   </div>
 
-  <!-- Dynamic Tab Panels -->
-  <div id="panels-container">
-    <!-- Generated by JS -->
-  </div>
+  <!-- Tab Panels -->
+  <div id="panels-container"></div>
 
   <!-- Divider -->
   <div class="divider"></div>
 
-  <!-- Social -->
-  <div class="social-row">
-    <a class="social-btn" href="https://instagram.com/jadilebihfit" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-      <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-    </a>
-    <a class="social-btn" href="https://wa.me/6285286535908" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
-      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-    </a>
-    <a class="social-btn" href="https://www.tiktok.com/@jadilebihfit" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-      <svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
-    </a>
-    <a class="social-btn" href="https://www.youtube.com/@jadilebihfit" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-      <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-    </a>
-  </div>
+  <!-- Social Media Links -->
+  <div class="social-row" id="ui-socials"></div>
 
   <p class="footer">2026 JadiLebihFit &nbsp;&middot;&nbsp; Dibuat dengan sepenuh hati dari Medan</p>
 
-</div>
-
-<!-- ════════════════════════════════════════════════
-     ADMIN FLOATING BUTTON & MODAL
-     ════════════════════════════════════════════════ -->
-<button class="admin-float-btn" id="btn-open-admin" title="Buka Menu Admin">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
-    <circle cx="12" cy="12" r="3"/>
-  </svg>
-</button>
-
-<div class="admin-modal-backdrop" id="admin-modal">
-  <div class="admin-modal">
-    <div class="admin-header">
-      <h2>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-        Menu Admin JadiLebihFit
-      </h2>
-      <button class="admin-close" id="btn-close-admin">&times;</button>
-    </div>
-
-    <div class="admin-nav">
-      <button class="admin-nav-btn active" data-view="view-items">Kelola Item/Link</button>
-      <button class="admin-nav-btn" data-view="view-sections">Kelola Section</button>
-      <button class="admin-nav-btn" data-view="view-profile">Edit Profil</button>
-      <button class="admin-nav-btn" data-view="view-backup">Backup Data</button>
-    </div>
-
-    <div class="admin-body">
-      <!-- VIEW: Kelola Items -->
-      <div class="admin-view active" id="view-items">
-        <div class="form-group">
-          <label>Pilih Section / Tab</label>
-          <select class="form-control" id="select-item-section"></select>
-        </div>
-
-        <div id="admin-items-list" style="display:flex; flex-direction:column; gap:8px;"></div>
-
-        <button class="btn-admin btn-admin-primary" id="btn-show-add-item">+ Tambah Menu / Link Baru</button>
-
-        <!-- Form Tambah/Edit Item -->
-        <div id="form-item-container" style="display:none; background:hsl(36 8% 7%); border:1px solid var(--border); border-radius:10px; padding:14px; margin-top:8px;">
-          <h3 id="form-item-title" style="font-size:13px; color:hsl(var(--gold-light)); margin-bottom:10px;">Tambah Item Baru</h3>
-          <div style="display:flex; flex-direction:column; gap:10px;">
-            <input type="hidden" id="edit-item-index" value="-1" />
-            <div class="form-group">
-              <label>Judul Menu</label>
-              <input type="text" class="form-control" id="item-title" placeholder="Contoh: Konsultasi Khusus" />
-            </div>
-            <div class="form-group">
-              <label>Subtitle / Deskripsi Singkat</label>
-              <input type="text" class="form-control" id="item-subtitle" placeholder="Contoh: Chat langsung sama coach" />
-            </div>
-            <div class="form-group">
-              <label>URL / Link Tujuan (WA / Website)</label>
-              <input type="text" class="form-control" id="item-url" placeholder="https://wa.me/... atau https://..." />
-            </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-              <div class="form-group">
-                <label>Teks Badge</label>
-                <input type="text" class="form-control" id="item-badge" placeholder="Contoh: WhatsApp / Gratis" />
-              </div>
-              <div class="form-group">
-                <label>Warna Badge &amp; Icon</label>
-                <select class="form-control" id="item-badge-style">
-                  <option value="gold">Gold (Emas)</option>
-                  <option value="blue">Blue (Biru)</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Pilihan Icon</label>
-              <select class="form-control" id="item-icon">
-                <option value="wa">WhatsApp / Team</option>
-                <option value="dumbbell">Dumbbell / Fitness</option>
-                <option value="screen">Monitor / Virtual</option>
-                <option value="chart">Grafik / Chart Progress</option>
-                <option value="clock">Jam / Target</option>
-                <option value="pulse">Pulse / Tools</option>
-                <option value="eye">Mata / Story</option>
-                <option value="link">Link Eksternal</option>
-              </select>
-            </div>
-            <div style="display:flex; gap:8px; margin-top:4px;">
-              <button class="btn-admin btn-admin-primary" id="btn-save-item" style="flex:1;">Simpan Item</button>
-              <button class="btn-admin btn-admin-secondary" id="btn-cancel-item">Batal</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- VIEW: Kelola Section -->
-      <div class="admin-view" id="view-sections">
-        <p style="font-size:12px; color:var(--muted);">Tambah atau ubah kategori tab navigasi di halaman bio:</p>
-        <div id="admin-sections-list" style="display:flex; flex-direction:column; gap:8px;"></div>
-
-        <div style="display:flex; gap:8px; margin-top:8px;">
-          <input type="text" class="form-control" id="new-section-name" placeholder="Nama Section Baru (cth: E-Book)" />
-          <button class="btn-admin btn-admin-primary" id="btn-add-section" style="white-space:nowrap;">+ Tambah Section</button>
-        </div>
-      </div>
-
-      <!-- VIEW: Edit Profil -->
-      <div class="admin-view" id="view-profile">
-        <div class="form-group">
-          <label>Nama Brand / Profil</label>
-          <input type="text" class="form-control" id="prof-name" />
-        </div>
-        <div class="form-group">
-          <label>Tagline</label>
-          <input type="text" class="form-control" id="prof-tagline" />
-        </div>
-        <div class="form-group">
-          <label>Bio Singkat (Logat Medan)</label>
-          <textarea class="form-control" id="prof-bio"></textarea>
-        </div>
-        <button class="btn-admin btn-admin-primary" id="btn-save-profile">Simpan Perubahan Profil</button>
-      </div>
-
-      <!-- VIEW: Backup / Export -->
-      <div class="admin-view" id="view-backup">
-        <p style="font-size:12px; color:var(--muted); line-height:1.5;">Semua perubahan tersimpan otomatis di browser ini. Lo bisa salin data konfigurasi untuk backup kapan saja:</p>
-        <textarea class="form-control" id="backup-json" readonly style="font-size:11px; font-family:monospace; min-height:110px;"></textarea>
-        <div style="display:flex; gap:8px;">
-          <button class="btn-admin btn-admin-secondary" id="btn-copy-backup" style="flex:1;">📋 Salin Data JSON</button>
-          <button class="btn-admin btn-admin-danger" id="btn-reset-default">Reset ke Awal</button>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -872,11 +502,24 @@
     link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'
   };
 
+  const SOCIAL_SVGS = {
+    instagram: '<svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>',
+    whatsapp: '<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>',
+    tiktok: '<svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>',
+    youtube: '<svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>'
+  };
+
   const DEFAULT_DATA = {
     profile: {
       name: "JadiLebihFit",
       tagline: "Fitness Coach & Health Creator",
       bio: "Bantu kau hidup lebih sehat, lebih kuat, dan lebih percaya diri — dari latihan sampai pola makan. Mantap kali, kan?"
+    },
+    socials: {
+      instagram: "https://instagram.com/jadilebihfit",
+      whatsapp: "https://wa.me/6285286535908",
+      tiktok: "https://www.tiktok.com/@jadilebihfit",
+      youtube: "https://www.youtube.com/@jadilebihfit"
     },
     sections: [
       {
@@ -966,13 +609,7 @@
     ]
   };
 
-  let AppData = JSON.parse(localStorage.getItem('jadilebihfit_data')) || DEFAULT_DATA;
-
-  function saveData() {
-    localStorage.setItem('jadilebihfit_data', JSON.stringify(AppData));
-    renderApp();
-    renderAdmin();
-  }
+  const AppData = JSON.parse(localStorage.getItem('jadilebihfit_data')) || DEFAULT_DATA;
 
   function renderApp() {
     document.getElementById('ui-name').textContent = AppData.profile.name;
@@ -981,17 +618,18 @@
 
     const tabsContainer = document.getElementById('ui-tabs');
     const panelsContainer = document.getElementById('panels-container');
+    const socialsContainer = document.getElementById('ui-socials');
 
-    const currentActiveSection = document.querySelector('.tab-btn.active')?.dataset.panel || AppData.sections[0]?.id;
+    const currentActiveSection = AppData.sections[0]?.id;
 
     tabsContainer.innerHTML = AppData.sections.map((sec, i) => {
-      const isActive = sec.id === currentActiveSection || (!AppData.sections.some(s => s.id === currentActiveSection) && i === 0);
+      const isActive = i === 0;
       return '<button class="tab-btn ' + (isActive ? 'active' : '') + '" role="tab" aria-selected="' + isActive + '" data-panel="' + sec.id + '">' + sec.title + '</button>';
     }).join('');
 
     panelsContainer.innerHTML = AppData.sections.map((sec, i) => {
-      const isActive = sec.id === currentActiveSection || (!AppData.sections.some(s => s.id === currentActiveSection) && i === 0);
-      const cardsHtml = sec.items.map(item => {
+      const isActive = i === 0;
+      const cardsHtml = (sec.items || []).map(item => {
         const iconSvg = ICONS[item.icon] || ICONS.link;
         const isBlue = item.style === 'blue';
         const colorStroke = isBlue ? 'hsl(214,82%,70%)' : 'hsl(46,82%,62%)';
@@ -1020,6 +658,16 @@
       '</div>';
     }).join('');
 
+    // Render Socials
+    if (AppData.socials) {
+      socialsContainer.innerHTML = Object.entries(AppData.socials).map(([key, url]) => {
+        if (!url) return '';
+        const svg = SOCIAL_SVGS[key] || '';
+        return '<a class="social-btn" href="' + url + '" target="_blank" rel="noopener noreferrer" aria-label="' + key + '">' + svg + '</a>';
+      }).join('');
+    }
+
+    // Tab interaction
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.tab-btn').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
@@ -1030,6 +678,7 @@
       });
     });
 
+    // Ripple effect
     document.querySelectorAll('.link-card').forEach(card => {
       card.addEventListener('click', function(e) {
         const r = document.createElement('span');
@@ -1042,196 +691,6 @@
       });
     });
   }
-
-  const modal = document.getElementById('admin-modal');
-  const btnOpenAdmin = document.getElementById('btn-open-admin');
-  const btnCloseAdmin = document.getElementById('btn-close-admin');
-
-  btnOpenAdmin.addEventListener('click', () => {
-    modal.classList.add('open');
-    renderAdmin();
-  });
-  btnCloseAdmin.addEventListener('click', () => modal.classList.remove('open'));
-  modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
-
-  document.querySelectorAll('.admin-nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.admin-view').forEach(v => v.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(btn.dataset.view).classList.add('active');
-    });
-  });
-
-  function renderAdmin() {
-    const secSelect = document.getElementById('select-item-section');
-    const prevVal = secSelect.value;
-    secSelect.innerHTML = AppData.sections.map(s => '<option value="' + s.id + '">' + s.title + '</option>').join('');
-    if (AppData.sections.some(s => s.id === prevVal)) secSelect.value = prevVal;
-
-    renderAdminItemsList();
-    renderAdminSectionsList();
-
-    document.getElementById('prof-name').value = AppData.profile.name;
-    document.getElementById('prof-tagline').value = AppData.profile.tagline;
-    document.getElementById('prof-bio').value = AppData.profile.bio;
-
-    document.getElementById('backup-json').value = JSON.stringify(AppData, null, 2);
-  }
-
-  function renderAdminItemsList() {
-    const secId = document.getElementById('select-item-section').value;
-    const sec = AppData.sections.find(s => s.id === secId);
-    const container = document.getElementById('admin-items-list');
-
-    if (!sec || !sec.items || sec.items.length === 0) {
-      container.innerHTML = '<p style="font-size:12px; color:var(--muted);">Belum ada menu di section ini.</p>';
-      return;
-    }
-
-    container.innerHTML = sec.items.map((item, idx) => '<div class="admin-item-card">' +
-      '<div class="admin-item-info">' +
-        '<div class="admin-item-title">' + item.title + '</div>' +
-        '<div class="admin-item-sub">' + item.subtitle + ' &middot; <span style="color:hsl(var(--gold-light))">' + item.badge + '</span></div>' +
-      '</div>' +
-      '<div class="admin-item-actions">' +
-        '<button class="btn-admin btn-admin-secondary" onclick="editItem(' + idx + ')" style="padding:6px 10px; font-size:11px;">Edit</button>' +
-        '<button class="btn-admin btn-admin-danger" onclick="deleteItem(' + idx + ')" style="padding:6px 10px; font-size:11px;">Hapus</button>' +
-      '</div>' +
-    '</div>').join('');
-  }
-
-  document.getElementById('select-item-section').addEventListener('change', renderAdminItemsList);
-
-  const formItemContainer = document.getElementById('form-item-container');
-  const btnShowAddItem = document.getElementById('btn-show-add-item');
-  const btnCancelItem = document.getElementById('btn-cancel-item');
-  const btnSaveItem = document.getElementById('btn-save-item');
-
-  btnShowAddItem.addEventListener('click', () => {
-    document.getElementById('edit-item-index').value = "-1";
-    document.getElementById('form-item-title').textContent = "Tambah Item Baru";
-    document.getElementById('item-title').value = "";
-    document.getElementById('item-subtitle').value = "";
-    document.getElementById('item-url').value = "";
-    document.getElementById('item-badge').value = "WhatsApp";
-    document.getElementById('item-badge-style').value = "gold";
-    document.getElementById('item-icon').value = "wa";
-    formItemContainer.style.display = 'block';
-    btnShowAddItem.style.display = 'none';
-  });
-
-  btnCancelItem.addEventListener('click', () => {
-    formItemContainer.style.display = 'none';
-    btnShowAddItem.style.display = 'inline-flex';
-  });
-
-  window.editItem = function(index) {
-    const secId = document.getElementById('select-item-section').value;
-    const sec = AppData.sections.find(s => s.id === secId);
-    const item = sec.items[index];
-
-    document.getElementById('edit-item-index').value = index;
-    document.getElementById('form-item-title').textContent = "Edit Menu: " + item.title;
-    document.getElementById('item-title').value = item.title;
-    document.getElementById('item-subtitle').value = item.subtitle;
-    document.getElementById('item-url').value = item.url;
-    document.getElementById('item-badge').value = item.badge;
-    document.getElementById('item-badge-style').value = item.style || 'gold';
-    document.getElementById('item-icon').value = item.icon || 'link';
-
-    formItemContainer.style.display = 'block';
-    btnShowAddItem.style.display = 'none';
-  };
-
-  window.deleteItem = function(index) {
-    if (!confirm('Hapus menu ini?')) return;
-    const secId = document.getElementById('select-item-section').value;
-    const sec = AppData.sections.find(s => s.id === secId);
-    sec.items.splice(index, 1);
-    saveData();
-  };
-
-  btnSaveItem.addEventListener('click', () => {
-    const title = document.getElementById('item-title').value.trim();
-    if (!title) return alert('Judul menu wajib diisi!');
-
-    const secId = document.getElementById('select-item-section').value;
-    const sec = AppData.sections.find(s => s.id === secId);
-    const idx = parseInt(document.getElementById('edit-item-index').value);
-
-    const itemData = {
-      title: title,
-      subtitle: document.getElementById('item-subtitle').value.trim(),
-      url: document.getElementById('item-url').value.trim() || '#',
-      badge: document.getElementById('item-badge').value.trim() || 'Link',
-      style: document.getElementById('item-badge-style').value,
-      icon: document.getElementById('item-icon').value
-    };
-
-    if (idx >= 0) {
-      sec.items[idx] = itemData;
-    } else {
-      sec.items.push(itemData);
-    }
-
-    formItemContainer.style.display = 'none';
-    btnShowAddItem.style.display = 'inline-flex';
-    saveData();
-  });
-
-  function renderAdminSectionsList() {
-    const container = document.getElementById('admin-sections-list');
-    container.innerHTML = AppData.sections.map((sec, idx) => '<div class="admin-item-card">' +
-      '<div class="admin-item-info">' +
-        '<div class="admin-item-title">' + sec.title + ' <span style="font-size:11px; color:var(--muted);">(' + sec.items.length + ' item)</span></div>' +
-      '</div>' +
-      '<div class="admin-item-actions">' +
-        '<button class="btn-admin btn-admin-danger" onclick="deleteSection(' + idx + ')" style="padding:6px 10px; font-size:11px;">Hapus</button>' +
-      '</div>' +
-    '</div>').join('');
-  }
-
-  document.getElementById('btn-add-section').addEventListener('click', () => {
-    const name = document.getElementById('new-section-name').value.trim();
-    if (!name) return alert('Nama section wajib diisi!');
-    const id = 'sec_' + Date.now();
-    AppData.sections.push({
-      id: id,
-      title: name,
-      label: name,
-      items: []
-    });
-    document.getElementById('new-section-name').value = '';
-    saveData();
-  });
-
-  window.deleteSection = function(idx) {
-    if (AppData.sections.length <= 1) return alert('Minimal harus ada 1 section!');
-    if (!confirm('Hapus section "' + AppData.sections[idx].title + '" beserta isinya?')) return;
-    AppData.sections.splice(idx, 1);
-    saveData();
-  };
-
-  document.getElementById('btn-save-profile').addEventListener('click', () => {
-    AppData.profile.name = document.getElementById('prof-name').value.trim();
-    AppData.profile.tagline = document.getElementById('prof-tagline').value.trim();
-    AppData.profile.bio = document.getElementById('prof-bio').value.trim();
-    saveData();
-    alert('Profil berhasil diupdate!');
-  });
-
-  document.getElementById('btn-copy-backup').addEventListener('click', () => {
-    navigator.clipboard.writeText(JSON.stringify(AppData, null, 2));
-    alert('Data JSON berhasil disalin!');
-  });
-
-  document.getElementById('btn-reset-default').addEventListener('click', () => {
-    if (!confirm('Yakin nak reset semua data ke pengaturan awal?')) return;
-    AppData = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    saveData();
-    alert('Data berhasil di-reset!');
-  });
 
   renderApp();
 </script>

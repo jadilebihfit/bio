@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f0e0c" />
+  <title>Admin Dashboard &middot; JadiLebihFit</title>
+  <style>
+    :root {
+      --bg:            #0f0e0c;
+      --surface:       hsl(36 8% 9%);
+      --surface2:      hsl(38 10% 12%);
+      --border:        hsl(40 8% 18%);
+      --text:          hsl(40 15% 96%);
+      --muted:         hsl(40 8% 62%);
+      --gold:          44 72% 52%;
+      --gold-light:    44 82% 68%;
+      --font:          -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 60px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .gold-grad {
+      background: linear-gradient(100deg,
+        hsl(40 68% 46%) 0%,
+        hsl(46 92% 70%) 22%,
+        hsl(48 100% 85%) 38%,
+        hsl(45 90% 62%) 55%,
+        hsl(40 72% 48%) 78%,
+        hsl(46 92% 70%) 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+    }
+
+    .admin-container {
+      width: 100%;
+      max-width: 640px;
+      background: hsl(36 8% 10%);
+      border: 1px solid hsl(var(--gold) / .3);
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px hsl(var(--gold) / .12);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .admin-header {
+      padding: 20px 24px;
+      background: hsl(36 8% 7%);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .admin-header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .btn-preview {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 8px;
+      background: hsl(var(--gold) / .15);
+      border: 1px solid hsl(var(--gold) / .35);
+      color: hsl(var(--gold-light));
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-preview:hover { background: hsl(var(--gold) / .25); transform: translateY(-1px); }
+
+    .admin-tabs {
+      display: flex;
+      background: hsl(36 8% 8%);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 4px 12px;
+      gap: 4px;
+    }
+    .admin-tabs::-webkit-scrollbar { display: none; }
+
+    .admin-tab {
+      padding: 10px 14px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s, color 0.2s;
+    }
+    .admin-tab.active {
+      background: hsl(var(--gold) / .15);
+      color: hsl(var(--gold-light));
+      border: 1px solid hsl(var(--gold) / .3);
+    }
+
+    .admin-content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .admin-panel { display: none; flex-direction: column; gap: 16px; }
+    .admin-panel.active { display: flex; }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: hsl(var(--gold-light));
+    }
+    .form-control {
+      width: 100%;
+      padding: 11px 13px;
+      background: hsl(36 8% 7%);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13.5px;
+      transition: border-color 0.2s;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: hsl(var(--gold));
+    }
+    textarea.form-control { min-height: 80px; resize: vertical; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-gold {
+      background: linear-gradient(180deg, hsl(46 82% 62%), hsl(42 72% 46%));
+      color: hsl(40 40% 8%);
+    }
+    .btn-gold:hover { opacity: 0.92; transform: translateY(-1px); }
+    .btn-secondary {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-secondary:hover { background: hsl(40 8% 18%); }
+    .btn-danger {
+      background: rgba(255, 69, 58, 0.15);
+      border: 1px solid rgba(255, 69, 58, 0.35);
+      color: #ff453a;
+    }
+    .btn-danger:hover { background: rgba(255, 69, 58, 0.25); }
+
+    .item-card {
+      background: hsl(36 8% 8%);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .item-card:hover { border-color: hsl(var(--gold) / .35); }
+    .item-info { flex: 1; min-width: 0; }
+    .item-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .item-sub { font-size: 12px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-actions { display: flex; gap: 6px; }
+
+    .badge-pill {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: hsl(var(--gold) / .15);
+      color: hsl(var(--gold-light));
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-container">
+  <div class="admin-header">
+    <div>
+      <h1 class="gold-grad">JadiLebihFit Admin</h1>
+      <p style="font-size:12px; color:var(--muted); margin-top:2px;">Kelola Menu, Section, Profil &amp; Sosmed</p>
+    </div>
+    <a href="index.html" target="_blank" class="btn-preview">
+      👁️ Lihat Halaman Bio
+    </a>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-target="tab-items">🔗 Kelola Menu &amp; Link</button>
+    <button class="admin-tab" data-target="tab-sections">📂 Kelola Section</button>
+    <button class="admin-tab" data-target="tab-socials">📱 Link Sosmed</button>
+    <button class="admin-tab" data-target="tab-profile">👤 Edit Profil</button>
+    <button class="admin-tab" data-target="tab-export">💾 Backup / Reset</button>
+  </div>
+
+  <div class="admin-content">
+
+    <!-- 1. KELOLA ITEMS -->
+    <div class="admin-panel active" id="tab-items">
+      <div class="form-group">
+        <label>Pilih Kategori Section</label>
+        <select class="form-control" id="select-section"></select>
+      </div>
+
+      <div id="items-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+
+      <button class="btn btn-gold" id="btn-show-add-item">+ Tambah Menu / Link Baru</button>
+
+      <!-- Form Tambah/Edit Item -->
+      <div id="item-form-box" style="display:none; background:hsl(36 8% 7%); border:1px solid var(--border); border-radius:12px; padding:16px;">
+        <h3 id="form-item-heading" style="font-size:14px; color:hsl(var(--gold-light)); margin-bottom:12px;">Tambah Item Baru</h3>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <input type="hidden" id="item-edit-idx" value="-1" />
+          <div class="form-group">
+            <label>Judul Menu / Tombol</label>
+            <input type="text" class="form-control" id="item-title" placeholder="Contoh: Konsultasi Privat" />
+          </div>
+          <div class="form-group">
+            <label>Subtitle / Penjelasan Singkat</label>
+            <input type="text" class="form-control" id="item-subtitle" placeholder="Contoh: Chat langsung sama bang coach" />
+          </div>
+          <div class="form-group">
+            <label>URL / Link Tujuan (WA / Website)</label>
+            <input type="text" class="form-control" id="item-url" placeholder="https://wa.me/... atau https://..." />
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label>Teks Badge</label>
+              <input type="text" class="form-control" id="item-badge" placeholder="Contoh: WhatsApp / Gratis" />
+            </div>
+            <div class="form-group">
+              <label>Warna Aksen</label>
+              <select class="form-control" id="item-style">
+                <option value="gold">Gold (Emas Luxury)</option>
+                <option value="blue">Blue (Biru Sporty)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Pilihan Icon</label>
+            <select class="form-control" id="item-icon">
+              <option value="wa">WhatsApp / Team</option>
+              <option value="dumbbell">Dumbbell / Fitness</option>
+              <option value="screen">Monitor / Virtual</option>
+              <option value="chart">Grafik / Chart Progress</option>
+              <option value="clock">Jam / Target</option>
+              <option value="pulse">Pulse / Tools</option>
+              <option value="eye">Mata / Story</option>
+              <option value="link">Link Eksternal</option>
+            </select>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:6px;">
+            <button class="btn btn-gold" id="btn-save-item" style="flex:1;">Simpan Menu</button>
+            <button class="btn btn-secondary" id="btn-cancel-item">Batal</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. KELOLA SECTIONS -->
+    <div class="admin-panel" id="tab-sections">
+      <p style="font-size:12px; color:var(--muted);">Kelola tab kategori yang muncul di atas halaman bio:</p>
+      <div id="sections-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <input type="text" class="form-control" id="new-section-input" placeholder="Nama Section Baru (cth: E-Book)" />
+        <button class="btn btn-gold" id="btn-add-section" style="white-space:nowrap;">+ Tambah Section</button>
+      </div>
+    </div>
+
+    <!-- 3. LINK SOSMED -->
+    <div class="admin-panel" id="tab-socials">
+      <p style="font-size:12px; color:var(--muted);">Ubah link icon media sosial di bagian bawah halaman bio:</p>
+      <div class="form-group">
+        <label>Instagram URL</label>
+        <input type="text" class="form-control" id="soc-instagram" placeholder="https://instagram.com/..." />
+      </div>
+      <div class="form-group">
+        <label>WhatsApp URL</label>
+        <input type="text" class="form-control" id="soc-whatsapp" placeholder="https://wa.me/628..." />
+      </div>
+      <div class="form-group">
+        <label>TikTok URL</label>
+        <input type="text" class="form-control" id="soc-tiktok" placeholder="https://www.tiktok.com/@..." />
+      </div>
+      <div class="form-group">
+        <label>YouTube URL</label>
+        <input type="text" class="form-control" id="soc-youtube" placeholder="https://www.youtube.com/@..." />
+      </div>
+      <button class="btn btn-gold" id="btn-save-socials">Simpan Link Sosmed</button>
+    </div>
+
+    <!-- 4. EDIT PROFIL -->
+    <div class="admin-panel" id="tab-profile">
+      <div class="form-group">
+        <label>Nama Profil</label>
+        <input type="text" class="form-control" id="prof-name" />
+      </div>
+      <div class="form-group">
+        <label>Tagline</label>
+        <input type="text" class="form-control" id="prof-tagline" />
+      </div>
+      <div class="form-group">
+        <label>Bio Singkat (Logat Medan)</label>
+        <textarea class="form-control" id="prof-bio"></textarea>
+      </div>
+      <button class="btn btn-gold" id="btn-save-profile">Simpan Profil</button>
+    </div>
+
+    <!-- 5. BACKUP / RESET -->
+    <div class="admin-panel" id="tab-export">
+      <p style="font-size:12px; color:var(--muted); line-height:1.5;">Data tersimpan otomatis di browser ini. Lo bisa salin format JSON untuk backup kapan saja:</p>
+      <textarea class="form-control" id="backup-box" readonly style="font-size:11px; font-family:monospace; min-height:130px;"></textarea>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-secondary" id="btn-copy-backup" style="flex:1;">📋 Salin Data JSON</button>
+        <button class="btn btn-danger" id="btn-reset">Reset ke Awal</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const DEFAULT_DATA = {
+    profile: {
+      name: "JadiLebihFit",
+      tagline: "Fitness Coach & Health Creator",
+      bio: "Bantu kau hidup lebih sehat, lebih kuat, dan lebih percaya diri — dari latihan sampai pola makan. Mantap kali, kan?"
+    },
+    socials: {
+      instagram: "https://instagram.com/jadilebihfit",
+      whatsapp: "https://wa.me/6285286535908",
+      tiktok: "https://www.tiktok.com/@jadilebihfit",
+      youtube: "https://www.youtube.com/@jadilebihfit"
+    },
+    sections: [
+      {
+        id: "collab",
+        title: "Kolaborasi",
+        label: "Endorsement & Kerjasama",
+        items: [
+          {
+            title: "Endorsement & Kerjasama",
+            subtitle: "Chat bang, jangan segan-segan",
+            url: "https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20tertarik%20nak%20kerja%20sama%20atau%20endorse%20sama%20JadiLebihFit.%20Ini%20detail%20aku%20bang%3A%0A%0ANama%20Brand%2FProduk%3A%20%5Bisi%20di%20sini%5D%0AJenis%20Kerja%20Sama%3A%20%5BEndorsement%20%2F%20Paid%20Promote%20%2F%20Affiliate%20%2F%20Lainnya%5D%0AProduk%2FLayanan%3A%20%5Bceritain%20singkat%20bang%5D%0ATimeline%3A%20%5Bkapan%20dibutuhkan%5D%0ABudget%3A%20%5Bjika%20ada%5D%0A%0AMakasih%20bang%2C%20ditunggu%20ya!",
+            badge: "WhatsApp",
+            style: "gold",
+            icon: "wa"
+          }
+        ]
+      },
+      {
+        id: "coaching",
+        title: "Coaching",
+        label: "Program Coaching",
+        items: [
+          {
+            title: "Coaching Online",
+            subtitle: "Program personal dari mana pun kau berada",
+            url: "https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20mau%20daftar%20Coaching%20Online%20JadiLebihFit.%20Ini%20info%20aku%20bang%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20naik%20massa%20otot%5D%0APreferensi%3A%20Online%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0AMantap%20kali%20bang%2C%20makasih!",
+            badge: "Virtual",
+            style: "blue",
+            icon: "screen"
+          },
+          {
+            title: "Coaching Offline",
+            subtitle: "Latihan langsung sama bang coach",
+            url: "https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20mau%20daftar%20Coaching%20Offline%20JadiLebihFit.%20Ini%20info%20aku%20bang%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20naik%20massa%20otot%5D%0ALokasi%3A%20%5Bkota%20%2F%20gym%20mana%20bang%5D%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0AMantap%20kali%20bang%2C%20makasih!",
+            badge: "Tatap Muka",
+            style: "gold",
+            icon: "dumbbell"
+          }
+        ]
+      },
+      {
+        id: "tools",
+        title: "Tools",
+        label: "Bantu Progres Kau",
+        items: [
+          {
+            title: "Hitung Kalori & Makro",
+            subtitle: "Tau berapa yang kau perlu makan",
+            url: "https://tools.jadilebihfit.xyz",
+            badge: "Gratis",
+            style: "gold",
+            icon: "chart"
+          },
+          {
+            title: "Cek BMI & Berat Ideal",
+            subtitle: "Tau posisi kau sekarang di mana",
+            url: "https://tools.jadilebihfit.xyz",
+            badge: "Gratis",
+            style: "gold",
+            icon: "clock"
+          },
+          {
+            title: "Semua Tools Fitness",
+            subtitle: "Lengkap, gratis, dan mantap kali",
+            url: "https://tools.jadilebihfit.xyz",
+            badge: "LebihFit",
+            style: "blue",
+            icon: "pulse"
+          }
+        ]
+      },
+      {
+        id: "stori",
+        title: "Stori",
+        label: "Perjalanan Saya",
+        items: [
+          {
+            title: "Stori JadiLebihFit",
+            subtitle: "Kisah nyata di balik transformasi aku",
+            url: "https://stori.jadilebihfit.xyz",
+            badge: "Perjalanan",
+            style: "gold",
+            icon: "eye"
+          }
+        ]
+      }
+    ]
+  };
+
+  let AppData = JSON.parse(localStorage.getItem('jadilebihfit_data')) || DEFAULT_DATA;
+
+  function save() {
+    localStorage.setItem('jadilebihfit_data', JSON.stringify(AppData));
+    render();
+  }
+
+  // Tab switching
+  document.querySelectorAll('.admin-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.target).classList.add('active');
+    });
+  });
+
+  function render() {
+    // 1. Populate Section Selector
+    const secSelect = document.getElementById('select-section');
+    const curVal = secSelect.value;
+    secSelect.innerHTML = AppData.sections.map(s => '<option value="' + s.id + '">' + s.title + '</option>').join('');
+    if (AppData.sections.some(s => s.id === curVal)) secSelect.value = curVal;
+
+    renderItemsList();
+    renderSectionsList();
+
+    // 2. Profile
+    document.getElementById('prof-name').value = AppData.profile.name || '';
+    document.getElementById('prof-tagline').value = AppData.profile.tagline || '';
+    document.getElementById('prof-bio').value = AppData.profile.bio || '';
+
+    // 3. Socials
+    const soc = AppData.socials || {};
+    document.getElementById('soc-instagram').value = soc.instagram || '';
+    document.getElementById('soc-whatsapp').value = soc.whatsapp || '';
+    document.getElementById('soc-tiktok').value = soc.tiktok || '';
+    document.getElementById('soc-youtube').value = soc.youtube || '';
+
+    // 4. Backup
+    document.getElementById('backup-box').value = JSON.stringify(AppData, null, 2);
+  }
+
+  function renderItemsList() {
+    const secId = document.getElementById('select-section').value;
+    const sec = AppData.sections.find(s => s.id === secId);
+    const container = document.getElementById('items-list');
+
+    if (!sec || !sec.items || sec.items.length === 0) {
+      container.innerHTML = '<p style="font-size:12px; color:var(--muted); padding:10px;">Belum ada menu di section ini.</p>';
+      return;
+    }
+
+    container.innerHTML = sec.items.map((item, idx) => '<div class="item-card">' +
+      '<div class="item-info">' +
+        '<div class="item-title">' + item.title + '</div>' +
+        '<div class="item-sub"><span class="badge-pill">' + item.badge + '</span> ' + item.subtitle + '</div>' +
+      '</div>' +
+      '<div class="item-actions">' +
+        '<button class="btn btn-secondary" onclick="editItem(' + idx + ')" style="padding:6px 10px; font-size:11px;">Edit</button>' +
+        '<button class="btn btn-danger" onclick="deleteItem(' + idx + ')" style="padding:6px 10px; font-size:11px;">Hapus</button>' +
+      '</div>' +
+    '</div>').join('');
+  }
+
+  document.getElementById('select-section').addEventListener('change', renderItemsList);
+
+  const formBox = document.getElementById('item-form-box');
+  const btnShowAdd = document.getElementById('btn-show-add-item');
+
+  btnShowAdd.addEventListener('click', () => {
+    document.getElementById('item-edit-idx').value = "-1";
+    document.getElementById('form-item-heading').textContent = "Tambah Item Baru";
+    document.getElementById('item-title').value = "";
+    document.getElementById('item-subtitle').value = "";
+    document.getElementById('item-url').value = "";
+    document.getElementById('item-badge').value = "WhatsApp";
+    document.getElementById('item-style').value = "gold";
+    document.getElementById('item-icon').value = "wa";
+    formBox.style.display = 'block';
+    btnShowAdd.style.display = 'none';
+  });
+
+  document.getElementById('btn-cancel-item').addEventListener('click', () => {
+    formBox.style.display = 'none';
+    btnShowAdd.style.display = 'inline-flex';
+  });
+
+  window.editItem = function(idx) {
+    const secId = document.getElementById('select-section').value;
+    const sec = AppData.sections.find(s => s.id === secId);
+    const item = sec.items[idx];
+
+    document.getElementById('item-edit-idx').value = idx;
+    document.getElementById('form-item-heading').textContent = "Edit Menu: " + item.title;
+    document.getElementById('item-title').value = item.title;
+    document.getElementById('item-subtitle').value = item.subtitle;
+    document.getElementById('item-url').value = item.url;
+    document.getElementById('item-badge').value = item.badge;
+    document.getElementById('item-style').value = item.style || 'gold';
+    document.getElementById('item-icon').value = item.icon || 'link';
+
+    formBox.style.display = 'block';
+    btnShowAdd.style.display = 'none';
+  };
+
+  window.deleteItem = function(idx) {
+    if (!confirm('Hapus menu ini?')) return;
+    const secId = document.getElementById('select-section').value;
+    const sec = AppData.sections.find(s => s.id === secId);
+    sec.items.splice(idx, 1);
+    save();
+  };
+
+  document.getElementById('btn-save-item').addEventListener('click', () => {
+    const title = document.getElementById('item-title').value.trim();
+    if (!title) return alert('Judul menu wajib diisi!');
+
+    const secId = document.getElementById('select-section').value;
+    const sec = AppData.sections.find(s => s.id === secId);
+    const idx = parseInt(document.getElementById('item-edit-idx').value);
+
+    const itemData = {
+      title: title,
+      subtitle: document.getElementById('item-subtitle').value.trim(),
+      url: document.getElementById('item-url').value.trim() || '#',
+      badge: document.getElementById('item-badge').value.trim() || 'Link',
+      style: document.getElementById('item-style').value,
+      icon: document.getElementById('item-icon').value
+    };
+
+    if (idx >= 0) {
+      sec.items[idx] = itemData;
+    } else {
+      sec.items.push(itemData);
+    }
+
+    formBox.style.display = 'none';
+    btnShowAdd.style.display = 'inline-flex';
+    save();
+  });
+
+  function renderSectionsList() {
+    const container = document.getElementById('sections-list');
+    container.innerHTML = AppData.sections.map((sec, idx) => '<div class="item-card">' +
+      '<div class="item-info">' +
+        '<div class="item-title">' + sec.title + ' <span style="font-size:11px; color:var(--muted);">(' + (sec.items || []).length + ' item)</span></div>' +
+      '</div>' +
+      '<div class="item-actions">' +
+        '<button class="btn btn-danger" onclick="deleteSection(' + idx + ')" style="padding:6px 10px; font-size:11px;">Hapus</button>' +
+      '</div>' +
+    '</div>').join('');
+  }
+
+  document.getElementById('btn-add-section').addEventListener('click', () => {
+    const name = document.getElementById('new-section-input').value.trim();
+    if (!name) return alert('Nama section wajib diisi!');
+    AppData.sections.push({
+      id: 'sec_' + Date.now(),
+      title: name,
+      label: name,
+      items: []
+    });
+    document.getElementById('new-section-input').value = '';
+    save();
+  });
+
+  window.deleteSection = function(idx) {
+    if (AppData.sections.length <= 1) return alert('Minimal harus ada 1 section!');
+    if (!confirm('Hapus section "' + AppData.sections[idx].title + '" beserta isinya?')) return;
+    AppData.sections.splice(idx, 1);
+    save();
+  };
+
+  document.getElementById('btn-save-socials').addEventListener('click', () => {
+    AppData.socials = {
+      instagram: document.getElementById('soc-instagram').value.trim(),
+      whatsapp: document.getElementById('soc-whatsapp').value.trim(),
+      tiktok: document.getElementById('soc-tiktok').value.trim(),
+      youtube: document.getElementById('soc-youtube').value.trim()
+    };
+    save();
+    alert('Link media sosial berhasil disimpan!');
+  });
+
+  document.getElementById('btn-save-profile').addEventListener('click', () => {
+    AppData.profile = {
+      name: document.getElementById('prof-name').value.trim(),
+      tagline: document.getElementById('prof-tagline').value.trim(),
+      bio: document.getElementById('prof-bio').value.trim()
+    };
+    save();
+    alert('Profil berhasil disimpan!');
+  });
+
+  document.getElementById('btn-copy-backup').addEventListener('click', () => {
+    navigator.clipboard.writeText(JSON.stringify(AppData, null, 2));
+    alert('Data JSON berhasil disalin!');
+  });
+
+  document.getElementById('btn-reset').addEventListener('click', () => {
+    if (!confirm('Yakin nak reset semua data ke pengaturan awal?')) return;
+    AppData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    save();
+    alert('Data berhasil di-reset!');
+  });
+
+  render();
+</script>
+
+</body>
+</html>
