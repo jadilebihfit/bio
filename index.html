@@ -169,7 +169,7 @@
       border-radius: 999px;
       padding: 4px;
       gap: 2px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .tab-btn {
@@ -181,10 +181,62 @@
       font-size: 12.5px;
       font-weight: 500;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s;
       background: transparent;
       color: var(--muted);
       letter-spacing: -0.1px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      outline: 1.5px solid transparent;
+      outline-offset: -1px;
+    }
+
+    /* shimmer sweep on inactive tabs */
+    .tab-btn:not(.active)::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        100deg,
+        transparent 20%,
+        hsl(var(--gold) / .18) 50%,
+        transparent 80%
+      );
+      transform: translateX(-100%);
+      animation: tabShimmer 3s ease-in-out infinite;
+    }
+
+    /* stagger shimmer so each tab fires at different time */
+    .tab-btn:not(.active):nth-child(2)::before { animation-delay: 0.4s; }
+    .tab-btn:not(.active):nth-child(3)::before { animation-delay: 0.8s; }
+    .tab-btn:not(.active):nth-child(4)::before { animation-delay: 1.2s; }
+
+    @keyframes tabShimmer {
+      0%   { transform: translateX(-100%); opacity: 0; }
+      10%  { opacity: 1; }
+      50%  { transform: translateX(100%); opacity: 1; }
+      60%  { opacity: 0; }
+      100% { transform: translateX(100%); opacity: 0; }
+    }
+
+    /* pulsing gold outline on inactive tabs */
+    .tab-btn:not(.active) {
+      animation: tabGlow 3s ease-in-out infinite;
+    }
+    .tab-btn:not(.active):nth-child(2) { animation-delay: 0.4s; }
+    .tab-btn:not(.active):nth-child(3) { animation-delay: 0.8s; }
+    .tab-btn:not(.active):nth-child(4) { animation-delay: 1.2s; }
+
+    @keyframes tabGlow {
+      0%, 100% { outline-color: transparent;            color: var(--muted); }
+      40%, 60% { outline-color: hsl(var(--gold)/.35);  color: hsl(var(--gold-light)); }
+    }
+
+    .tab-btn:hover:not(.active) {
+      background: hsl(var(--gold) / .08);
+      color: hsl(var(--gold-light));
+      animation: none;
+      outline-color: hsl(var(--gold) / .4);
     }
 
     .tab-btn.active {
@@ -193,7 +245,9 @@
       font-weight: 700;
       box-shadow: 0 4px 16px -6px hsl(var(--gold) / .55),
                   inset 0 1px 0 hsl(48 90% 82% / .55);
+      animation: none;
     }
+    .tab-btn.active::before { display: none; }
 
     /* ── Tab panels ── */
     .panel { display: none; width: 100%; flex-direction: column; gap: 10px; }
