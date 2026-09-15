@@ -1,28 +1,28 @@
 ﻿<!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0d0d0f" />
+  <meta name="theme-color" content="#0f0e0c" />
   <title>JadiLebihFit</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2330d158' stroke-width='2'%3E%3Cpath d='M18 8h1a4 4 0 0 1 0 8h-1'/%3E%3Cpath d='M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z'/%3E%3Cline x1='6' y1='1' x2='6' y2='4'/%3E%3Cline x1='10' y1='1' x2='10' y2='4'/%3E%3Cline x1='14' y1='1' x2='14' y2='4'/%3E%3C/svg%3E" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+    /* ── Design tokens (gold luxury dark — inspired by pakarpajak.id) ── */
     :root {
-      --bg:       #0d0d0f;
-      --surface:  #1a1a1e;
-      --surface2: #242428;
-      --border:   rgba(255,255,255,0.08);
-      --text:     #f2f2f7;
-      --muted:    #8e8e93;
-      --accent:   #30d158;
-      --radius:   16px;
-      --font:     -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --bg:            #0f0e0c;
+      --surface:       hsl(36 8% 9%);
+      --surface2:      hsl(38 10% 12%);
+      --border:        hsl(40 8% 18%);
+      --border-hover:  hsl(44 72% 52% / .45);
+      --text:          hsl(40 15% 96%);
+      --muted:         hsl(40 8% 62%);
+      --gold:          44 72% 52%;
+      --gold-light:    44 82% 68%;
+      --gold-dark:     40 55% 34%;
+      --radius:        0.65rem;
+      --font:          -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
-
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-
     body {
       font-family: var(--font);
       background: var(--bg);
@@ -31,38 +31,63 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0 0 64px;
+      padding: 0 0 72px;
       -webkit-font-smoothing: antialiased;
     }
 
+    /* ── Ambient glow bg ── */
     body::before {
       content: "";
       position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(48,209,88,0.10) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 40% at 80% 110%, rgba(48,209,88,0.06) 0%, transparent 55%);
+      left: 50%; top: 0;
+      width: 820px; height: 520px;
+      margin-left: -410px;
+      background: radial-gradient(ellipse 55% 55% at 50% 38%,
+        hsl(46 94% 56% / .13),
+        hsl(44 88% 52% / .05) 48%,
+        transparent 74%);
+      filter: blur(28px);
       pointer-events: none;
       z-index: 0;
+      animation: glowDrift 14s ease-in-out infinite alternate;
+    }
+    @keyframes glowDrift {
+      0%   { transform: translate(-22px, 4px) scale(1);    opacity: .8; }
+      100% { transform: translate(24px, -10px) scale(1.1); opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) { body::before { animation: none; } }
+
+    /* ── Gold gradient text util ── */
+    .gold-grad {
+      background: linear-gradient(100deg,
+        hsl(40 68% 46%) 0%,
+        hsl(46 92% 70%) 22%,
+        hsl(48 100% 85%) 38%,
+        hsl(45 90% 62%) 55%,
+        hsl(40 72% 48%) 78%,
+        hsl(46 92% 70%) 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
     }
 
+    /* ── Wrapper ── */
     .wrapper {
       position: relative;
       z-index: 1;
       width: 100%;
       max-width: 480px;
-      padding: 56px 20px 0;
+      padding: 60px 20px 0;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    /* Profile */
+    /* ── Profile ── */
     .profile {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       text-align: center;
       margin-bottom: 36px;
     }
@@ -71,8 +96,12 @@
       width: 96px;
       height: 96px;
       border-radius: 50%;
-      padding: 2.5px;
-      background: linear-gradient(135deg, var(--accent) 0%, #0a84ff 100%);
+      padding: 2px;
+      background: linear-gradient(135deg,
+        hsl(40 68% 46%),
+        hsl(48 100% 78%),
+        hsl(42 72% 46%));
+      box-shadow: 0 0 32px -8px hsl(var(--gold) / .5);
       flex-shrink: 0;
     }
 
@@ -82,45 +111,47 @@
       border-radius: 50%;
       object-fit: cover;
       display: block;
+      background: var(--surface);
     }
 
     .profile h1 {
       font-size: 22px;
       font-weight: 700;
       letter-spacing: -0.4px;
-      color: var(--text);
+      text-transform: uppercase;
     }
 
     .profile .tagline {
       font-size: 13px;
       color: var(--muted);
       font-style: italic;
-      letter-spacing: 0.05px;
+      letter-spacing: 0.2px;
     }
 
     .profile .bio {
       font-size: 13.5px;
       line-height: 1.65;
-      color: rgba(242,242,247,0.65);
+      color: hsl(40 12% 75%);
       max-width: 320px;
     }
 
-    /* Tabs */
+    /* ── Tab bar ── */
     .tabs {
       width: 100%;
       display: flex;
       background: var(--surface);
-      border-radius: 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
       padding: 4px;
       gap: 2px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
 
     .tab-btn {
       flex: 1;
       padding: 8px 6px;
       border: none;
-      border-radius: 9px;
+      border-radius: 999px;
       font-family: var(--font);
       font-size: 12.5px;
       font-weight: 500;
@@ -132,33 +163,34 @@
     }
 
     .tab-btn.active {
-      background: var(--surface2);
-      color: var(--text);
-      font-weight: 600;
+      background: linear-gradient(180deg, hsl(46 82% 62%), hsl(42 72% 46%));
+      color: hsl(40 40% 8%);
+      font-weight: 700;
+      box-shadow: 0 4px 16px -6px hsl(var(--gold) / .55),
+                  inset 0 1px 0 hsl(48 90% 82% / .55);
     }
 
-    /* Panels */
+    /* ── Tab panels ── */
     .panel { display: none; width: 100%; flex-direction: column; gap: 10px; }
     .panel.active { display: flex; animation: fadeUp 0.22s ease; }
-
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(6px); }
+      from { opacity: 0; transform: translateY(7px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* Section label */
+    /* ── Section label ── */
     .section-label {
       font-size: 10.5px;
-      font-weight: 600;
-      letter-spacing: 0.9px;
+      font-weight: 700;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      color: var(--muted);
+      color: hsl(var(--gold));
       margin-top: 4px;
       margin-bottom: 2px;
       padding-left: 2px;
     }
 
-    /* Link cards */
+    /* ── Link cards ── */
     .link-card {
       display: flex;
       align-items: center;
@@ -170,23 +202,34 @@
       border-radius: var(--radius);
       text-decoration: none;
       color: var(--text);
-      transition: background 0.18s, transform 0.15s, border-color 0.18s;
+      transition: background 0.2s, transform 0.16s, border-color 0.2s, box-shadow 0.2s;
       -webkit-tap-highlight-color: transparent;
       position: relative;
       overflow: hidden;
       cursor: pointer;
     }
 
-    .link-card:hover, .link-card:focus-visible {
-      background: var(--surface2);
-      border-color: rgba(255,255,255,0.13);
-      transform: translateY(-1px);
+    /* gold shimmer top edge */
+    .link-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, hsl(var(--gold) / .3), transparent);
+      transition: opacity 0.2s;
+      opacity: 0;
     }
 
-    .link-card:active { transform: scale(0.985); }
+    .link-card:hover {
+      background: var(--surface2);
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px -16px rgba(0,0,0,.8),
+                  0 4px 14px -8px hsl(var(--gold) / .3);
+    }
 
-    .link-card.wa:hover   { border-color: rgba(37,211,102,0.28); }
-    .link-card.tool:hover { border-color: rgba(48,209,88,0.28); }
+    .link-card:hover::before { opacity: 1; }
+    .link-card:active { transform: scale(0.985); }
 
     .card-left {
       display: flex;
@@ -204,16 +247,19 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      background: hsl(var(--gold) / .1);
+      border: 1px solid hsl(var(--gold) / .2);
     }
-
-    .icon-wa   { background: rgba(37,211,102,0.12); }
-    .icon-tool { background: rgba(48,209,88,0.10); }
-    .icon-coaching { background: rgba(10,132,255,0.12); }
 
     .card-icon svg {
       width: 18px;
       height: 18px;
-      stroke-width: 1.8;
+      stroke-width: 1.7;
+    }
+
+    .card-icon.blue-icon {
+      background: hsl(214 72% 52% / .1);
+      border-color: hsl(214 72% 52% / .2);
     }
 
     .card-text { flex: 1; min-width: 0; }
@@ -241,29 +287,35 @@
 
     .badge {
       font-size: 9.5px;
-      font-weight: 600;
-      padding: 1.5px 6px;
-      border-radius: 20px;
-      letter-spacing: 0.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+      letter-spacing: 0.6px;
       text-transform: uppercase;
     }
 
-    .badge-wa      { background: rgba(37,211,102,0.15); color: #34c759; }
-    .badge-tool    { background: rgba(48,209,88,0.12);  color: #30d158; }
-    .badge-coaching{ background: rgba(10,132,255,0.14); color: #0a84ff; }
+    .badge-gold {
+      background: hsl(var(--gold) / .15);
+      color: hsl(var(--gold-light));
+    }
+
+    .badge-blue {
+      background: hsl(214 72% 52% / .14);
+      color: hsl(214 82% 70%);
+    }
 
     .card-arrow {
-      color: rgba(142,142,147,0.5);
+      color: hsl(var(--gold) / .4);
       flex-shrink: 0;
       transition: transform 0.2s, color 0.2s;
     }
 
     .link-card:hover .card-arrow {
       transform: translate(2px, -2px);
-      color: var(--muted);
+      color: hsl(var(--gold-light));
     }
 
-    /* Social row */
+    /* ── Social row ── */
     .social-row {
       display: flex;
       justify-content: center;
@@ -282,46 +334,43 @@
       justify-content: center;
       color: var(--muted);
       text-decoration: none;
-      transition: background 0.18s, color 0.18s, transform 0.15s, border-color 0.18s;
+      transition: background 0.18s, color 0.18s, transform 0.15s, border-color 0.2s, box-shadow 0.2s;
       -webkit-tap-highlight-color: transparent;
     }
 
     .social-btn:hover {
       background: var(--surface2);
-      color: var(--text);
+      color: hsl(var(--gold-light));
       transform: translateY(-2px);
-      border-color: rgba(255,255,255,0.13);
+      border-color: hsl(var(--gold) / .4);
+      box-shadow: 0 8px 20px -10px hsl(var(--gold) / .4);
     }
 
-    .social-btn svg {
-      width: 17px;
-      height: 17px;
-      fill: currentColor;
-    }
+    .social-btn svg { width: 17px; height: 17px; fill: currentColor; }
 
-    /* Divider */
+    /* ── Divider ── */
     .divider {
       width: 100%;
       height: 1px;
-      background: var(--border);
-      margin: 4px 0 2px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 28px 0 0;
     }
 
-    /* Footer */
+    /* ── Footer ── */
     .footer {
-      margin-top: 32px;
+      margin-top: 20px;
       font-size: 11px;
-      color: rgba(142,142,147,0.4);
-      letter-spacing: 0.2px;
+      color: hsl(40 8% 42%);
+      letter-spacing: 0.3px;
       text-align: center;
     }
 
-    /* Ripple */
+    /* ── Ripple ── */
     @keyframes ripple { to { transform: scale(4); opacity: 0; } }
     .ripple-fx {
       position: absolute;
       border-radius: 50%;
-      background: rgba(255,255,255,0.08);
+      background: hsl(var(--gold) / .1);
       width: 60px; height: 60px;
       margin-top: -30px; margin-left: -30px;
       animation: ripple 0.5s linear;
@@ -329,7 +378,7 @@
     }
 
     @media (min-width: 520px) {
-      .wrapper    { padding-top: 72px; }
+      .wrapper    { padding-top: 76px; }
       .profile h1 { font-size: 26px; }
       .card-title { font-size: 15.5px; }
     }
@@ -343,7 +392,7 @@
     <div class="avatar-ring">
       <img src="profile.jpg" alt="JadiLebihFit" loading="eager" />
     </div>
-    <h1>JadiLebihFit</h1>
+    <h1 class="gold-grad">JadiLebihFit</h1>
     <p class="tagline">Fitness Coach &amp; Health Creator</p>
     <p class="bio">Membantu kamu hidup lebih sehat, lebih kuat, dan lebih percaya diri — dari latihan hingga pola makan.</p>
   </div>
@@ -358,18 +407,18 @@
   <!-- Panel: Kolaborasi -->
   <div class="panel active" id="panel-collab" role="tabpanel">
     <p class="section-label">Endorsement &amp; Kerjasama</p>
-    <a class="link-card wa"
+    <a class="link-card"
        href="https://wa.me/6285286535908?text=Halo%20Kak!%20Saya%20tertarik%20untuk%20melakukan%20kerjasama%20atau%20endorsement%20bersama%20JadiLebihFit.%20Berikut%20detail%20saya%3A%0A%0ANama%20Brand%2FProduk%3A%20%5Bisi%20di%20sini%5D%0AJenis%20Kerjasama%3A%20%5BEndorsement%20%2F%20Paid%20Promote%20%2F%20Affiliate%20%2F%20Lainnya%5D%0AProduk%2FLayanan%3A%20%5Bdeskripsikan%20singkat%5D%0ATimeline%3A%20%5Bkapan%20dibutuhkan%5D%0ABudget%3A%20%5Bjika%20ada%5D%0A%0ATerima%20kasih!%20Ditunggu%20responnya."
        target="_blank" rel="noopener noreferrer">
       <div class="card-left">
-        <div class="card-icon icon-wa">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#34c759" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17 20h5v-2a3 3 0 0 0-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 0 1 5.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 0 1 9.288 0M15 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM7 10a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" stroke-linecap="round" stroke-linejoin="round"/>
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="hsl(46,82%,62%)" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 20h5v-2a3 3 0 0 0-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 0 1 5.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 0 1 9.288 0M15 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM7 10a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/>
           </svg>
         </div>
         <div class="card-text">
           <div class="card-title">Endorsement &amp; Kerjasama</div>
-          <div class="card-sub"><span class="badge badge-wa">WhatsApp</span> Hubungi untuk kolaborasi</div>
+          <div class="card-sub"><span class="badge badge-gold">WhatsApp</span> Hubungi untuk kolaborasi</div>
         </div>
       </div>
       <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -381,39 +430,37 @@
   <!-- Panel: Coaching -->
   <div class="panel" id="panel-coaching" role="tabpanel">
     <p class="section-label">Program Coaching</p>
-
-    <a class="link-card wa"
+    <a class="link-card"
        href="https://wa.me/6285286535908?text=Halo%20Kak!%20Saya%20ingin%20mendaftar%20program%20Coaching%20Online%20JadiLebihFit.%20Berikut%20informasi%20saya%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20massa%20otot%20%2F%20hidup%20sehat%5D%0APreferensi%3A%20Online%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0ATerima%20kasih."
        target="_blank" rel="noopener noreferrer">
       <div class="card-left">
-        <div class="card-icon icon-coaching">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#0a84ff" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+        <div class="card-icon blue-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="hsl(214,82%,70%)" stroke-linecap="round" stroke-linejoin="round">
             <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/>
           </svg>
         </div>
         <div class="card-text">
           <div class="card-title">Coaching Online</div>
-          <div class="card-sub"><span class="badge badge-coaching">Virtual</span> Program personal jarak jauh</div>
+          <div class="card-sub"><span class="badge badge-blue">Virtual</span> Program personal jarak jauh</div>
         </div>
       </div>
       <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
       </svg>
     </a>
-
-    <a class="link-card wa"
+    <a class="link-card"
        href="https://wa.me/6285286535908?text=Halo%20Kak!%20Saya%20ingin%20mendaftar%20program%20Coaching%20Offline%20JadiLebihFit.%20Berikut%20informasi%20saya%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20massa%20otot%20%2F%20hidup%20sehat%5D%0ALokasi%3A%20%5Bkota%20%2F%20gym%20yang%20diinginkan%5D%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0ATerima%20kasih."
        target="_blank" rel="noopener noreferrer">
       <div class="card-left">
-        <div class="card-icon icon-wa">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#34c759" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6.5 6.5h11M6.5 10h11M6.5 13.5h6"/><rect x="2" y="3" width="20" height="18" rx="2"/>
-            <circle cx="17" cy="16" r="3"/><path d="m19.5 18.5 1.5 1.5"/>
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="hsl(46,82%,62%)" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+            <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
           </svg>
         </div>
         <div class="card-text">
           <div class="card-title">Coaching Offline</div>
-          <div class="card-sub"><span class="badge badge-wa">Tatap Muka</span> Sesi langsung bersama coach</div>
+          <div class="card-sub"><span class="badge badge-gold">Tatap Muka</span> Sesi langsung bersama coach</div>
         </div>
       </div>
       <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -425,18 +472,18 @@
   <!-- Panel: Tools -->
   <div class="panel" id="panel-tools" role="tabpanel">
     <p class="section-label">Tools Gratis</p>
-    <a class="link-card tool"
+    <a class="link-card"
        href="https://darderdor19.github.io/lebihfittools/"
        target="_blank" rel="noopener noreferrer">
       <div class="card-left">
-        <div class="card-icon icon-tool">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#30d158" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="hsl(46,82%,62%)" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
           </svg>
         </div>
         <div class="card-text">
           <div class="card-title">LebihFit Tools</div>
-          <div class="card-sub"><span class="badge badge-tool">Gratis</span> Kalkulator dan tools fitness</div>
+          <div class="card-sub"><span class="badge badge-gold">Gratis</span> Kalkulator dan tools fitness</div>
         </div>
       </div>
       <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -444,6 +491,9 @@
       </svg>
     </a>
   </div>
+
+  <!-- Divider -->
+  <div class="divider"></div>
 
   <!-- Social -->
   <div class="social-row">
@@ -468,7 +518,6 @@
 <script>
   const tabs   = document.querySelectorAll('.tab-btn');
   const panels = document.querySelectorAll('.panel');
-
   tabs.forEach(btn => {
     btn.addEventListener('click', () => {
       tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
@@ -478,7 +527,6 @@
       document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
     });
   });
-
   document.querySelectorAll('.link-card').forEach(card => {
     card.addEventListener('click', function(e) {
       const r = document.createElement('span');
@@ -491,6 +539,5 @@
     });
   });
 </script>
-
 </body>
 </html>
