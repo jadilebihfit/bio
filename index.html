@@ -135,6 +135,31 @@
       max-width: 320px;
     }
 
+    /* ── Tab wrapper & hint ── */
+    .tabs-wrapper {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    .tabs-hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: hsl(var(--gold) / .5);
+      margin-bottom: 8px;
+      animation: hintPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes hintPulse {
+      0%, 100% { opacity: .5; }
+      50%       { opacity: 1; }
+    }
+
     /* ── Tab bar ── */
     .tabs {
       width: 100%;
@@ -394,22 +419,28 @@
     </div>
     <h1 class="gold-grad">JadiLebihFit</h1>
     <p class="tagline">Fitness Coach &amp; Health Creator</p>
-    <p class="bio">Membantu kamu hidup lebih sehat, lebih kuat, dan lebih percaya diri — dari latihan hingga pola makan.</p>
+    <p class="bio">Bantu kau hidup lebih sehat, lebih kuat, dan lebih percaya diri — dari latihan sampai pola makan. Mantap kali, kan?</p>
   </div>
 
   <!-- Tabs -->
-  <div class="tabs" role="tablist">
-    <button class="tab-btn active" role="tab" aria-selected="true"  data-panel="collab">Kolaborasi</button>
-    <button class="tab-btn"        role="tab" aria-selected="false" data-panel="coaching">Coaching</button>
-    <button class="tab-btn"        role="tab" aria-selected="false" data-panel="tools">Tools</button>
-    <button class="tab-btn"        role="tab" aria-selected="false" data-panel="stori">Stori</button>
+  <div class="tabs-wrapper">
+    <p class="tabs-hint">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      Pilih kategori di bawah ini
+    </p>
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" role="tab" aria-selected="true"  data-panel="collab">Kolaborasi</button>
+      <button class="tab-btn"        role="tab" aria-selected="false" data-panel="coaching">Coaching</button>
+      <button class="tab-btn"        role="tab" aria-selected="false" data-panel="tools">Tools</button>
+      <button class="tab-btn"        role="tab" aria-selected="false" data-panel="stori">Stori</button>
+    </div>
   </div>
 
   <!-- Panel: Kolaborasi -->
   <div class="panel active" id="panel-collab" role="tabpanel">
     <p class="section-label">Endorsement &amp; Kerjasama</p>
     <a class="link-card"
-       href="https://wa.me/6285286535908?text=Halo%20Kak!%20Saya%20tertarik%20untuk%20melakukan%20kerjasama%20atau%20endorsement%20bersama%20JadiLebihFit.%20Berikut%20detail%20saya%3A%0A%0ANama%20Brand%2FProduk%3A%20%5Bisi%20di%20sini%5D%0AJenis%20Kerjasama%3A%20%5BEndorsement%20%2F%20Paid%20Promote%20%2F%20Affiliate%20%2F%20Lainnya%5D%0AProduk%2FLayanan%3A%20%5Bdeskripsikan%20singkat%5D%0ATimeline%3A%20%5Bkapan%20dibutuhkan%5D%0ABudget%3A%20%5Bjika%20ada%5D%0A%0ATerima%20kasih!%20Ditunggu%20responnya."
+       href="https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20tertarik%20nak%20kerja%20sama%20atau%20endorse%20sama%20JadiLebihFit.%20Ini%20detail%20aku%20bang%3A%0A%0ANama%20Brand%2FProduk%3A%20%5Bisi%20di%20sini%5D%0AJenis%20Kerja%20Sama%3A%20%5BEndorsement%20%2F%20Paid%20Promote%20%2F%20Affiliate%20%2F%20Lainnya%5D%0AProduk%2FLayanan%3A%20%5Bceritain%20singkat%20bang%5D%0ATimeline%3A%20%5Bkapan%20dibutuhkan%5D%0ABudget%3A%20%5Bjika%20ada%5D%0A%0AMakasih%20bang%2C%20ditunggu%20ya!"
        target="_blank" rel="noopener noreferrer">
       <div class="card-left">
         <div class="card-icon">
@@ -419,7 +450,7 @@
         </div>
         <div class="card-text">
           <div class="card-title">Endorsement &amp; Kerjasama</div>
-          <div class="card-sub"><span class="badge badge-gold">WhatsApp</span> Hubungi untuk kolaborasi</div>
+          <div class="card-sub"><span class="badge badge-gold">WhatsApp</span> Chat bang, jangan segan-segan</div>
         </div>
       </div>
       <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -432,7 +463,7 @@
   <div class="panel" id="panel-coaching" role="tabpanel">
     <p class="section-label">Program Coaching</p>
     <a class="link-card"
-       href="https://wa.me/6285286535908?text=Halo%20Kak!%20Saya%20ingin%20mendaftar%20program%20Coaching%20Online%20JadiLebihFit.%20Berikut%20informasi%20saya%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20massa%20otot%20%2F%20hidup%20sehat%5D%0APreferensi%3A%20Online%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0ATerima%20kasih."
+       href="https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20mau%20daftar%20Coaching%20Online%20JadiLebihFit.%20Ini%20info%20aku%20bang%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20naik%20massa%20otot%5D%0APreferensi%3A%20Online%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0AMantap%20kali%20bang%2C%20makasih!"
        target="_blank" rel="noopener noreferrer">
       <div class="card-left">
         <div class="card-icon blue-icon">
@@ -442,7 +473,7 @@
         </div>
         <div class="card-text">
           <div class="card-title">Coaching Online</div>
-          <div class="card-sub"><span class="badge badge-blue">Virtual</span> Program personal jarak jauh</div>
+          <div class="card-sub"><span class="badge badge-blue">Virtual</span> Program personal dari mana pun kau berada</div>
         </div>
       </div>
       <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -450,7 +481,7 @@
       </svg>
     </a>
     <a class="link-card"
-       href="https://wa.me/6285286535908?text=Halo%20Kak!%20Saya%20ingin%20mendaftar%20program%20Coaching%20Offline%20JadiLebihFit.%20Berikut%20informasi%20saya%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20massa%20otot%20%2F%20hidup%20sehat%5D%0ALokasi%3A%20%5Bkota%20%2F%20gym%20yang%20diinginkan%5D%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0ATerima%20kasih."
+       href="https://wa.me/6285286535908?text=Halo%20Bang!%20Aku%20mau%20daftar%20Coaching%20Offline%20JadiLebihFit.%20Ini%20info%20aku%20bang%3A%0A%0ANama%3A%20%5Bisi%20nama%5D%0ATujuan%3A%20%5Bmisal%3A%20turun%20berat%20badan%20%2F%20naik%20massa%20otot%5D%0ALokasi%3A%20%5Bkota%20%2F%20gym%20mana%20bang%5D%0AMulai%20kapan%3A%20%5Bisi%20tanggal%5D%0APertanyaan%3A%20%5Bjika%20ada%5D%0A%0AMantap%20kali%20bang%2C%20makasih!"
        target="_blank" rel="noopener noreferrer">
       <div class="card-left">
         <div class="card-icon">
@@ -461,7 +492,7 @@
         </div>
         <div class="card-text">
           <div class="card-title">Coaching Offline</div>
-          <div class="card-sub"><span class="badge badge-gold">Tatap Muka</span> Sesi langsung bersama coach</div>
+          <div class="card-sub"><span class="badge badge-gold">Tatap Muka</span> Latihan langsung sama bang coach</div>
         </div>
       </div>
       <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -472,19 +503,55 @@
 
   <!-- Panel: Tools -->
   <div class="panel" id="panel-tools" role="tabpanel">
-    <p class="section-label">Tools Gratis</p>
+    <p class="section-label">Bantu Progres Kau</p>
     <a class="link-card"
        href="https://darderdor19.github.io/lebihfittools/"
        target="_blank" rel="noopener noreferrer">
       <div class="card-left">
         <div class="card-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="hsl(46,82%,62%)" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="hsl(46,82%,62%)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7">
+            <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
+          </svg>
+        </div>
+        <div class="card-text">
+          <div class="card-title">Hitung Kalori &amp; Makro</div>
+          <div class="card-sub"><span class="badge badge-gold">Gratis</span> Tau berapa yang kau perlu makan</div>
+        </div>
+      </div>
+      <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+      </svg>
+    </a>
+    <a class="link-card"
+       href="https://darderdor19.github.io/lebihfittools/"
+       target="_blank" rel="noopener noreferrer">
+      <div class="card-left">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="hsl(46,82%,62%)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7">
+            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+          </svg>
+        </div>
+        <div class="card-text">
+          <div class="card-title">Cek BMI &amp; Berat Ideal</div>
+          <div class="card-sub"><span class="badge badge-gold">Gratis</span> Tau posisi kau sekarang di mana</div>
+        </div>
+      </div>
+      <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+      </svg>
+    </a>
+    <a class="link-card"
+       href="https://darderdor19.github.io/lebihfittools/"
+       target="_blank" rel="noopener noreferrer">
+      <div class="card-left">
+        <div class="card-icon blue-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="hsl(214,82%,70%)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
           </svg>
         </div>
         <div class="card-text">
-          <div class="card-title">LebihFit Tools</div>
-          <div class="card-sub"><span class="badge badge-gold">Gratis</span> Kalkulator dan tools fitness</div>
+          <div class="card-title">Semua Tools Fitness</div>
+          <div class="card-sub"><span class="badge badge-blue">LebihFit</span> Lengkap, gratis, dan mantap kali</div>
         </div>
       </div>
       <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -508,7 +575,7 @@
         </div>
         <div class="card-text">
           <div class="card-title">Stori JadiLebihFit</div>
-          <div class="card-sub"><span class="badge badge-gold">Perjalanan</span> Kisah di balik transformasi</div>
+          <div class="card-sub"><span class="badge badge-gold">Perjalanan</span> Kisah nyata di balik transformasi aku</div>
         </div>
       </div>
       <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -536,7 +603,7 @@
     </a>
   </div>
 
-  <p class="footer">2026 JadiLebihFit &nbsp;&middot;&nbsp; jadilebihfit.xyz</p>
+  <p class="footer">2026 JadiLebihFit &nbsp;&middot;&nbsp; Dibuat dengan sepenuh hati dari Medan</p>
 
 </div>
 
