@@ -126,7 +126,8 @@
   <div class="top-actions">
     <button class="b sm" data-act="openTab" title="Buka hasil di tab baru">↗ Buka preview</button>
     <button class="b sm" data-act="copyHTML">Copy HTML</button>
-    <button class="b sm red" data-act="downloadHTML">⬇ Download HTML</button>
+    <button class="b sm" data-act="downloadHTML">⬇ Download HTML</button>
+    <button class="b sm red" data-act="publish" id="pubBtn">🚀 Publish</button>
   </div>
 </header>
 
@@ -215,7 +216,7 @@ const ARROWS = {chevron:'<path d="M9 6l6 6-6 6"/>', diag:'<path d="M7 17 17 7M8 
 
 /* ---------- Data default (sesuai file lebihfit-linklist.html) ---------- */
 const DEFAULT = {
-  meta:{title:'Lebih Fit — Link List',desc:'Lebih Fit — Bantu lo latihan gym & WO. Kesalahan gym yang lo kira bener, gue bongkar pakai animasi.',fileName:'lebihfit-linklist.html'},
+  meta:{title:'Lebih Fit — Link List',desc:'Lebih Fit — Bantu lo latihan gym & WO. Kesalahan gym yang lo kira bener, gue bongkar pakai animasi.',fileName:'index.html'},
   profile:{name1:'Lebih',name2:'Fit',avatar:'',showAvatar:true,tagline:'Bantu lo latihan gym & WO',bio:'Kesalahan gym yang lo kira bener, gue bongkar pakai animasi. Biar latihan lo nggak sia-sia.',accent:'#E8432E'},
   featured:{show:true,sticker:'Mulai di sini!',kicker:'Program pemula',icon:'dumbbell',title:'Latihan pemula biar nggak salah dari awal',url:'https://pemula.jadilebihfit.xyz',displayUrl:'',newTab:false},
   links:[
@@ -255,7 +256,7 @@ function normalize(d){
 }
 function load(){ try{ const raw = localStorage.getItem(STORE_KEY); return normalize(raw ? JSON.parse(raw) : null); }catch(e){ return normalize(null); } }
 function save(){
-  try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); setStatus('Tersimpan otomatis · ' + new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})); }
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); setStatus('Tersimpan otomatis · ' + new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})); updatePubState(); }
   catch(e){ setStatus('⚠ Gagal simpan (storage penuh)'); toast('Storage browser penuh — coba pakai URL gambar, bukan upload.'); }
 }
 const get = p => p.split('.').reduce((o,k) => o == null ? undefined : o[k], S);
@@ -699,8 +700,32 @@ function tabSocial(){
 }
 
 /* ---------- Tab: Setelan ---------- */
+function G(label, key, o = {}){
+  return `<label class="fld"><span>${label}</span><input type="${o.type || 'text'}" data-gh="${key}" value="${esc(GH[key] || '')}" placeholder="${esc(o.ph || '')}" autocomplete="off" spellcheck="false">${o.hint ? `<small>${o.hint}</small>` : ''}</label>`;
+}
 function tabSettings(){
   return `
+  <section class="card">
+    <h3>Publish ke GitHub <span class="scr">auto update web</span></h3>
+    <p class="sub">Klik <b>🚀 Publish</b> → file di repo ke-update otomatis → web live ±1–2 menit (GitHub Pages).</p>
+    <div class="grid2">${G('Username / org', 'owner', {ph:'jadilebihfit'})}${G('Nama repo', 'repo', {ph:'bio'})}</div>
+    <div class="grid2">${G('Branch', 'branch', {ph:'main'})}${G('File tujuan', 'path', {ph:'index.html'})}</div>
+    ${G('GitHub token', 'token', {type:'password', ph:'github_pat_...', hint:'Token cuma disimpen di browser ini & <b>nggak</b> ikut ke file HTML. Jangan isi di komputer orang lain.'})}
+    <div class="add-row">
+      <button class="b teal" data-act="ghTest">Test koneksi</button>
+      <button class="b" data-act="pull">⬇ Ambil data live</button>
+      ${GH.token ? '<button class="b" data-act="ghForget">Hapus token</button>' : ''}
+    </div>
+    <details class="help" style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:800">Cara bikin token (sekali aja)</summary>
+      <ol style="margin-top:8px">
+        <li>Buka <b>github.com/settings/personal-access-tokens/new</b> (Fine-grained token).</li>
+        <li>Expiration: bebas (misal 1 tahun). Repository access: <b>Only select repositories</b> → pilih <code>${esc(GH.repo || 'bio')}</code>.</li>
+        <li>Permissions → Repository → <b>Contents: Read and write</b>. (Opsional: <b>Pages: Read</b> biar admin bisa ngasih tau pas web udah live.)</li>
+        <li>Generate → copy token → tempel di kolom di atas.</li>
+      </ol>
+    </details>
+  </section>
+
   <section class="card">
     <h3>SEO & file</h3>
     ${F('Judul halaman (tab browser)', 'meta.title')}
@@ -722,10 +747,10 @@ function tabSettings(){
     <h3>Cara pakai</h3>
     <ol>
       <li>Edit semua isi lewat tab <b>Profil, Link, Konten, Sosmed</b>. Preview di kanan langsung berubah.</li>
-      <li>Semua perubahan <b>auto-save</b> di browser ini.</li>
-      <li>Klik <b>⬇ Download HTML</b> (atau <code>Ctrl+S</code>) → dapet file linklist final.</li>
-      <li>Pindahin file itu ke folder <code>E:\\AI Joko\\bio lebih fit</code> / upload ke hosting lo.</li>
-      <li>File hasil download bisa di-<b>import balik</b> ke admin ini kapan aja buat diedit lagi.</li>
+      <li>Semua perubahan <b>auto-save</b> di browser ini (belum live).</li>
+      <li>Klik <b>🚀 Publish</b> → web utama ke-update dalam ±1–2 menit. Tombolnya ada tanda <b>•</b> kalau ada perubahan yang belum di-publish.</li>
+      <li>Admin juga bisa dibuka dari HP di <code>/lebihfit-admin.html</code> — isi token sekali, data live otomatis ke-load.</li>
+      <li>Cara manual: <b>⬇ Download HTML</b> → timpa <code>index.html</code> → commit & push.</li>
     </ol>
   </section>`;
 }
@@ -813,6 +838,7 @@ document.addEventListener('click', e => {
 const panel = $('#panel');
 panel.addEventListener('input', e => {
   const el = e.target, p = el.dataset.path;
+  if(el.dataset.gh){ GH[el.dataset.gh] = el.value.trim(); saveGH(); return; }
   if(!p || el.type === 'file') return;
   set(p, el.type === 'checkbox' ? el.checked : el.value);
   // update judul item tanpa re-render (biar fokus input nggak hilang)
@@ -892,8 +918,143 @@ document.addEventListener('keydown', e => {
   if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's'){ e.preventDefault(); downloadHTML(); }
 });
 
+/* =========================================================
+   PUBLISH KE GITHUB (GitHub Pages auto-deploy)
+   ========================================================= */
+const GH_KEY = 'lebihfit-gh-v1', PUB_KEY = 'lebihfit-published-v1';
+let GH = Object.assign({owner:'jadilebihfit', repo:'bio', branch:'main', path:'index.html', token:''}, (() => { try{ return JSON.parse(localStorage.getItem(GH_KEY) || '{}'); }catch(e){ return {}; } })());
+let publishing = false, buildTimer;
+function saveGH(){ try{ localStorage.setItem(GH_KEY, JSON.stringify(GH)); }catch(e){} }
+const encPath = p => String(p || 'index.html').replace(/^\/+/, '').split('/').map(encodeURIComponent).join('/');
+
+function gh(path, opt = {}){
+  const url = `https://api.github.com/repos/${encodeURIComponent(GH.owner)}/${encodeURIComponent(GH.repo)}${path ? '/' + path : ''}`;
+  return fetch(url, {...opt, cache:'no-store', headers:{
+    'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28',
+    ...(GH.token ? {'Authorization':'Bearer ' + GH.token} : {}), ...(opt.headers || {})
+  }});
+}
+async function ghErr(r){
+  let msg = ''; try{ msg = (await r.json()).message || ''; }catch(e){}
+  if(r.status === 401) return new Error('Token salah / udah expired');
+  if(r.status === 403 || r.status === 404) return new Error(`${r.status} ${msg} — cek nama repo & token punya akses "Contents: Read and write" ke repo ${GH.repo}`);
+  if(r.status === 409 || r.status === 422) return new Error(`${r.status} ${msg} — cek branch "${GH.branch}" udah ada (push dulu sekali)`);
+  return new Error(`${r.status} ${msg}`);
+}
+function b64(str){
+  const bytes = new TextEncoder().encode(str); let bin = '';
+  for(let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+function parseData(html){
+  const m = String(html).match(/<script type="application\/json" id="lebihfit-data">([\s\S]*?)<\/script>/);
+  return m ? JSON.parse(m[1]) : null;
+}
+const strip = d => JSON.stringify(d, (k, v) => k === 'id' ? undefined : v);
+function isDirty(){ const pub = localStorage.getItem(PUB_KEY); return !pub || strip(JSON.parse(pub)) !== strip(S); }
+function updatePubState(){
+  const b = document.getElementById('pubBtn'); if(!b || publishing) return;
+  const dirty = isDirty();
+  b.textContent = dirty ? '🚀 Publish •' : '✓ Live';
+  b.title = dirty ? 'Ada perubahan yang belum di-publish' : 'Web udah sama kayak yang di admin';
+}
+function markPublished(d){ try{ localStorage.setItem(PUB_KEY, JSON.stringify(d)); }catch(e){} updatePubState(); }
+
+async function publish(){
+  if(publishing) return;
+  if(!GH.token || !GH.owner || !GH.repo){ TAB = 'settings'; render(); toast('Isi GitHub token dulu di Setelan'); return; }
+  const btn = $('#pubBtn');
+  publishing = true; btn.textContent = '⏳ Publishing…';
+  try{
+    const p = encPath(GH.path), ref = encodeURIComponent(GH.branch || 'main');
+    let sha;
+    const g = await gh(`contents/${p}?ref=${ref}`);
+    if(g.ok) sha = (await g.json()).sha; else if(g.status !== 404) throw await ghErr(g);
+    const snapshot = clone(S);
+    const r = await gh(`contents/${p}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({
+      message:'Update link list via admin · ' + new Date().toLocaleString('id-ID'),
+      content:b64(buildHTML(snapshot, false)), branch:GH.branch || 'main', ...(sha ? {sha} : {})
+    })});
+    if(!r.ok) throw await ghErr(r);
+    const j = await r.json();
+    publishing = false; markPublished(snapshot);
+    setStatus('🚀 Ke-publish · nunggu GitHub Pages deploy…');
+    toast('🚀 Ke-publish! Web update ±1–2 menit lagi');
+    watchBuild(j.commit && j.commit.sha);
+  }catch(err){
+    publishing = false; updatePubState();
+    setStatus('⚠ Gagal publish'); toast('Gagal publish: ' + err.message);
+  }
+}
+function watchBuild(sha){
+  clearTimeout(buildTimer);
+  const started = Date.now();
+  const tick = async () => {
+    if(Date.now() - started > 5 * 60 * 1000){ setStatus('Ke-publish · cek web lo bentar lagi'); return; }
+    try{
+      const r = await gh('pages/builds/latest');
+      if(!r.ok){ setStatus('🚀 Ke-publish · live dalam ±1–2 menit'); return; } // token tanpa izin Pages → stop cek
+      const b = await r.json();
+      if(b.commit === sha && b.status === 'built'){ setStatus('✅ Udah LIVE · ' + new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})); toast('✅ Web udah live dengan update terbaru'); return; }
+      if(b.commit === sha && b.status === 'errored'){ setStatus('⚠ Deploy GitHub Pages error'); toast('Deploy error — cek tab Actions di GitHub'); return; }
+    }catch(e){ return; }
+    buildTimer = setTimeout(tick, 8000);
+  };
+  buildTimer = setTimeout(tick, 8000);
+}
+async function fetchLiveHTML(){
+  if(GH.token){
+    const r = await gh(`contents/${encPath(GH.path)}?ref=${encodeURIComponent(GH.branch || 'main')}`, {headers:{'Accept':'application/vnd.github.raw+json'}});
+    if(!r.ok) throw await ghErr(r);
+    return r.text();
+  }
+  if(/^https?:$/.test(location.protocol)){
+    const r = await fetch(GH.path.replace(/^\/+/, '') + '?t=' + Date.now(), {cache:'no-store'});
+    if(r.ok) return r.text();
+  }
+  throw new Error('Isi GitHub token dulu');
+}
+async function pullLive(silent){
+  try{
+    const data = parseData(await fetchLiveHTML());
+    if(!data){ if(!silent) toast('Web live belum pernah di-publish dari admin'); return false; }
+    if(!silent && isDirty() && !confirm('Ambil data dari web live? Perubahan yang belum di-publish bakal ketimpa.')) return false;
+    S = normalize(data); markPublished(S); commit(true);
+    if(!silent) toast('✓ Data live ke-load');
+    return true;
+  }catch(err){ if(!silent) toast('Gagal ambil: ' + err.message); return false; }
+}
+// Pas admin dibuka: kalau di admin nggak ada perubahan pending, sinkron sama versi live
+async function syncOnStart(){
+  if(!GH.token && !/^https?:$/.test(location.protocol)) return;
+  const hasLocal = !!localStorage.getItem(STORE_KEY);
+  if(hasLocal && isDirty()){
+    try{ const live = parseData(await fetchLiveHTML()); const pub = localStorage.getItem(PUB_KEY);
+      if(live && pub && strip(live) !== strip(JSON.parse(pub))) toast('Versi live beda sama di sini — cek Setelan → Ambil data live');
+    }catch(e){}
+    return;
+  }
+  if(await pullLive(true)) setStatus('✓ Sinkron sama web live');
+}
+Object.assign(ACTIONS, {
+  publish,
+  pull: () => pullLive(false),
+  ghTest: async () => {
+    if(!GH.token) return toast('Token masih kosong');
+    try{
+      const r = await gh('');
+      if(!r.ok) throw await ghErr(r);
+      const j = await r.json();
+      toast(j.permissions && j.permissions.push === false ? '⚠ Token cuma bisa baca — butuh Contents: Read and write' : `✓ Nyambung ke ${j.full_name}`);
+    }catch(err){ toast('✗ ' + err.message); }
+  },
+  ghForget: () => { if(confirm('Hapus token dari browser ini?')){ GH.token = ''; saveGH(); render(); toast('Token dihapus'); } }
+});
+
 render();
 updatePreview();
+updatePubState();
+syncOnStart();
 </script>
 </body>
 </html>
