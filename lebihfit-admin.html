@@ -228,7 +228,7 @@ const DEFAULT = {
     {id:uid(),show:true,text:'Latihan tiap hari',hl:'otot mengecil?!',url:'#',style:'p1',image:''},
     {id:uid(),show:true,text:'Dada gede',hl:'tanpa ke gym?!',url:'#',style:'p2',image:''},
     {id:uid(),show:true,text:'Otot lo harus',hl:'dirobek?!',url:'#',style:'p3',image:''}
-  ]},
+  ],links:[]},
   social:{show:true,items:[
     {id:uid(),show:true,platform:'instagram',url:'https://www.instagram.com/lebihfit/'},
     {id:uid(),show:true,platform:'tiktok',url:'#'},
@@ -250,8 +250,9 @@ function normalize(d){
   out.social = Object.assign(clone(DEFAULT.social), (d||{}).social || {});
   ['links'].forEach(k => { if(!Array.isArray(out[k])) out[k] = clone(DEFAULT[k]); });
   if(!Array.isArray(out.latest.posts)) out.latest.posts = [];
+  if(!Array.isArray(out.latest.links)) out.latest.links = [];
   if(!Array.isArray(out.social.items)) out.social.items = [];
-  [...out.links, ...out.latest.posts, ...out.social.items].forEach(x => { if(!x.id) x.id = uid(); if(x.show === undefined) x.show = true; });
+  [...out.links, ...out.latest.posts, ...out.latest.links, ...out.social.items].forEach(x => { if(!x.id) x.id = uid(); if(x.show === undefined) x.show = true; });
   return out;
 }
 function load(){ try{ const raw = localStorage.getItem(STORE_KEY); return normalize(raw ? JSON.parse(raw) : null); }catch(e){ return normalize(null); } }
@@ -308,7 +309,7 @@ function buildHTML(d, preview){
       </span>
     </a>`;
 
-  const items = d.links.filter(l => l.show).map(l => {
+  const renderLinkItem = l => {
     if(l.type === 'heading') return `
     <h2 class="sec">${e(l.title)}</h2>`;
     if(l.type === 'text') return `
@@ -320,7 +321,8 @@ function buildHTML(d, preview){
       <span class="txt"><span class="t">${e(l.title)}${l.badge ? ` <span class="badge">${e(l.badge)}</span>` : ''}</span>${l.desc ? `<span class="s">${e(l.desc)}</span>` : ''}</span>
       ${arrow ? sv(arrow, 20, 2.6) : ''}
     </a>`;
-  }).join('\n');
+  };
+  const items = d.links.filter(l => l.show).map(renderLinkItem).join('\n');
 
   const linksSec = (feat || items) ? `
   <section class="links" aria-label="Link utama">${feat}
@@ -328,19 +330,23 @@ ${items}
   </section>` : '';
 
   const posts = d.latest.posts.filter(x => x.show);
-  const latest = (!d.latest.show || !posts.length) ? '' : `
+  const cLinks = (d.latest.links || []).filter(l => l.show).map(renderLinkItem).join('\n');
+  const latest = (!d.latest.show || (!posts.length && !cLinks)) ? '' : `
   <section class="latest" aria-label="Konten terbaru">
     <div class="latest-head">
       <h2>${e(d.latest.heading)}</h2>
       ${d.latest.scribble ? `<span class="scribble">${e(d.latest.scribble)}</span>` : ''}
-    </div>
+    </div>${posts.length ? `
     <div class="grid">
 ${posts.map(x => {
   const img = imgSrc(x.image).replace(/["\\\n\r]/g,'');
   const style = img ? ` style="background-image:linear-gradient(to top,rgba(22,19,15,.85),rgba(22,19,15,0) 65%),url(&quot;${e(img)}&quot;)"` : '';
   return `      <a class="btn post ${e(x.style || 'p1')}${img ? ' has-img' : ''}" href="${e(safeUrl(x.url))}"${tgt(x.newTab)}${style}>${e(x.text)}${x.hl ? ` <em>${e(x.hl)}</em>` : ''}</a>`;
 }).join('\n')}
-    </div>
+    </div>` : ''}${cLinks ? `
+    <div class="links">
+${cLinks}
+    </div>` : ''}
   </section>`;
 
   const soc = d.social.items.filter(s => s.show && SOCIAL[s.platform]);
@@ -559,8 +565,8 @@ function acts(list, i, n, show){
 }
 
 /* ---------- Tab: Link ---------- */
-function linkItem(l, i, n){
-  const base = `links.${i}`;
+function linkItem(l, i, n, listPath = 'links'){
+  const base = `${listPath}.${i}`;
   let sw, sub, body;
   if(l.type === 'heading' || l.type === 'text'){
     sw = `<span class="sw" style="background:var(--cream)">${l.type === 'heading' ? 'H' : 'T'}</span>`;
@@ -582,7 +588,7 @@ function linkItem(l, i, n){
       ${F('Buka di tab baru', `${base}.newTab`, {type:'check'})}`;
   }
   return `<details class="item${l.show ? '' : ' off'}" data-id="${l.id}"${OPEN.has(l.id) ? ' open' : ''}>
-    <summary><span class="num">${i + 1}</span>${sw}<span class="ttl"><b>${esc(l.title || '(tanpa judul)')}${!l.show ? '<span class="badge">hidden</span>' : ''}</b><i>${esc(sub)}</i></span>${acts('links', i, n, l.show)}</summary>
+    <summary><span class="num">${i + 1}</span>${sw}<span class="ttl"><b>${esc(l.title || '(tanpa judul)')}${!l.show ? '<span class="badge">hidden</span>' : ''}</b><i>${esc(sub)}</i></span>${acts(listPath, i, n, l.show)}</summary>
     <div class="body">${body}</div>
   </details>`;
 }
@@ -651,8 +657,8 @@ function postItem(x, i, n){
   return `<details class="item${x.show ? '' : ' off'}" data-id="${x.id}"${OPEN.has(x.id) ? ' open' : ''}>
     <summary><span class="num">${i + 1}</span><span class="sw" style="background:${st.bg} ${img ? `url('${esc(img.replace(/['"\\\n\r]/g,''))}') center/cover` : ''};color:${st.fg}"></span><span class="ttl"><b>${esc((x.text + ' ' + (x.hl || '')).trim() || '(tanpa judul)')}${!x.show ? '<span class="badge">hidden</span>' : ''}</b><i>${esc(x.url && x.url !== '#' ? x.url : '⚠ URL belum diisi')}</i></span>${acts('latest.posts', i, n, x.show)}</summary>
     <div class="body">
-      <div class="grid2">${F('Teks', `${base}.text`, {ph:'Latihan tiap hari'})}${F('Teks highlight', `${base}.hl`, {ph:'otot mengecil?!'})}</div>
-      ${F('URL konten (Reels / TikTok / YouTube)', `${base}.url`, {type:'url', ph:'https://www.instagram.com/reel/...'})}
+      ${F('🔗 Link / URL Konten (Reels / TikTok / YouTube)', `${base}.url`, {type:'url', ph:'https://www.instagram.com/reel/...', hint:'Tempel link video IG Reels, TikTok, atau YouTube Shorts lo di sini.'})}
+      <div class="grid2">${F('Teks baris 1', `${base}.text`, {ph:'Latihan tiap hari'})}${F('Teks highlight (warna kuning/kontras)', `${base}.hl`, {ph:'otot mengecil?!'})}</div>
       ${colorPicker(`${base}.style`, POST_STYLES, 'Warna kartu')}
       ${imgField('Gambar thumbnail (opsional)', `${base}.image`, 600, false)}
       ${F('Buka di tab baru', `${base}.newTab`, {type:'check'})}
@@ -660,19 +666,29 @@ function postItem(x, i, n){
   </details>`;
 }
 function tabContent(){
-  const L = S.latest;
+  const L = S.latest, cLinks = L.links || [];
   return `
   <section class="card">
-    <h3>Konten terbaru <span class="scr">grid 3 kolom</span></h3>
-    <p class="sub">Kartu kecil buat promoin video/postingan terbaru.</p>
+    <h3>Konten terbaru <span class="scr">grid & link</span></h3>
+    <p class="sub">Promoin video/postingan terbaru lo + tambahin tombol link konten di bawahnya.</p>
     ${F('Tampilkan seksi konten terbaru', 'latest.show', {type:'check'})}
     <div class="grid2">${F('Judul seksi', 'latest.heading', {ph:'Konten terbaru'})}${F('Coretan', 'latest.scribble', {ph:'wajib tonton!'})}</div>
   </section>
   <section class="card">
-    <h3>Kartu konten <span class="scr">${L.posts.length} item</span></h3>
-    <p class="sub">Idealnya kelipatan 3 biar grid-nya rapi.</p>
-    ${L.posts.length ? L.posts.map((x, i) => postItem(x, i, L.posts.length)).join('') : '<div class="empty">Belum ada konten.</div>'}
-    <div class="add-row"><button class="b red" data-act="addPost">+ Tambah konten</button></div>
+    <h3>Kartu konten (Grid 3 kolom) <span class="scr">${L.posts.length} kartu</span></h3>
+    <p class="sub">Klik kartu di bawah buat isi <b>Link URL</b>, judul, warna, atau gambar thumbnail.</p>
+    ${L.posts.length ? L.posts.map((x, i) => postItem(x, i, L.posts.length)).join('') : '<div class="empty">Belum ada kartu konten.</div>'}
+    <div class="add-row"><button class="b red" data-act="addPost">+ Tambah kartu konten</button></div>
+  </section>
+  <section class="card">
+    <h3>Link di seksi konten <span class="scr">${cLinks.length} link</span></h3>
+    <p class="sub">Tombol link tambahan yang muncul tepat di bawah grid konten terbaru (misal: "Tonton Semua Video", link playlist, dll).</p>
+    ${cLinks.length ? cLinks.map((l, i) => linkItem(l, i, cLinks.length, 'latest.links')).join('') : '<div class="empty">Belum ada tombol link di seksi konten.</div>'}
+    <div class="add-row">
+      <button class="b red" data-act="addContentLink">+ Tambah link konten</button>
+      <button class="b" data-act="addContentHeading">+ Judul seksi</button>
+      <button class="b" data-act="addContentText">+ Teks</button>
+    </div>
   </section>`;
 }
 
@@ -760,7 +776,7 @@ function tabSettings(){
 const TABS = [
   ['profile','Profil', tabProfile],
   ['links','Link', tabLinks, () => S.links.length],
-  ['content','Konten', tabContent, () => S.latest.posts.length],
+  ['content','Konten', tabContent, () => S.latest.posts.length + (S.latest.links ? S.latest.links.length : 0)],
   ['social','Sosmed', tabSocial, () => S.social.items.length],
   ['settings','Setelan', tabSettings]
 ];
@@ -812,6 +828,9 @@ const ACTIONS = {
   addHeading: () => addTo('links', newLink('heading')),
   addText: () => addTo('links', newLink('text')),
   addPost: () => addTo('latest.posts', {id:uid(), show:true, text:'Judul konten', hl:'', url:'', style:'p1', image:'', newTab:false}),
+  addContentLink: () => addTo('latest.links', newLink('link')),
+  addContentHeading: () => addTo('latest.links', newLink('heading')),
+  addContentText: () => addTo('latest.links', newLink('text')),
   addSocial: () => { const used = S.social.items.map(s => s.platform); const p = Object.keys(SOCIAL).find(k => !used.includes(k)) || 'website'; addTo('social.items', {id:uid(), show:true, platform:p, url:''}); },
   downloadHTML,
   copyHTML: async () => toast(await copyText(buildHTML(S, false)) ? '✓ HTML dicopy ke clipboard' : 'Gagal copy'),
