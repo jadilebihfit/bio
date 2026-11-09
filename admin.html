@@ -60,6 +60,9 @@
   input[type=text]:focus,input[type=url]:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px var(--yellow)}
   textarea{resize:vertical;line-height:1.45}
   input[type=color]{width:44px;height:40px;padding:2px;border:2px solid var(--ink);border-radius:10px;background:#fff}
+  input[type=range]{flex:1;accent-color:var(--red);cursor:pointer}
+  .rng{display:flex;align-items:center;gap:10px}
+  .rng b{font-size:13px;font-weight:800;min-width:52px;text-align:right;background:#fff;border:2px solid var(--ink);border-radius:8px;padding:4px 7px}
   .chk{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px;cursor:pointer;margin:0 18px 12px 0}
   .chk input{width:20px;height:20px;accent-color:var(--red);margin:0}
   .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
@@ -224,7 +227,7 @@ const DEFAULT = {
     {id:uid(),type:'link',show:true,title:'Business Inquiry',desc:'Kerja sama, endorse & collab',url:'#',color:'navy',icon:'briefcase',arrow:'chevron',newTab:false,badge:''},
     {id:uid(),type:'link',show:true,title:'[JUDUL LINK LAIN]',desc:'[DESKRIPSI SINGKAT]',url:'#',color:'white',icon:'book',arrow:'chevron',newTab:false,badge:''}
   ],
-  latest:{show:true,heading:'Konten terbaru',scribble:'wajib tonton!',posts:[
+  latest:{show:true,heading:'Konten terbaru',scribble:'wajib tonton!',moreText:'Show More Konten',posts:[
     {id:uid(),show:true,text:'Latihan tiap hari',hl:'otot mengecil?!',url:'#',style:'p1',image:''},
     {id:uid(),show:true,text:'Dada gede',hl:'tanpa ke gym?!',url:'#',style:'p2',image:''},
     {id:uid(),show:true,text:'Otot lo harus',hl:'dirobek?!',url:'#',style:'p3',image:''}
@@ -234,6 +237,7 @@ const DEFAULT = {
     {id:uid(),show:true,platform:'tiktok',url:'#'},
     {id:uid(),show:true,platform:'youtube',url:'#'}
   ]},
+  fonts:{name:56,tagline:20,bio:16,featSticker:15,featKicker:13,featTitle:34,featUrl:14,linkTitle:22,linkDesc:13,secHeading:24,noteText:15,latestHeading:26,latestScribble:15,postTitle:15,moreBtn:20,footer:13},
   footer:'@lebihfit · Latihan bener, hasil kelihatan'
 };
 
@@ -245,7 +249,7 @@ const OPEN = new Set();
 function normalize(d){
   const base = clone(DEFAULT);
   const out = Object.assign(base, d || {});
-  ['meta','profile','featured'].forEach(k => out[k] = Object.assign(clone(DEFAULT[k]), (d||{})[k] || {}));
+  ['meta','profile','featured','fonts'].forEach(k => out[k] = Object.assign(clone(DEFAULT[k]), (d||{})[k] || {}));
   out.latest = Object.assign(clone(DEFAULT.latest), (d||{}).latest || {});
   out.social = Object.assign(clone(DEFAULT.social), (d||{}).social || {});
   ['links'].forEach(k => { if(!Array.isArray(out[k])) out[k] = clone(DEFAULT[k]); });
@@ -286,7 +290,9 @@ const tgt = n => n ? ' target="_blank" rel="noopener"' : '';
    GENERATOR — bikin file HTML linklist final
    ========================================================= */
 function buildHTML(d, preview){
-  const e = esc, p = d.profile, f = d.featured, m = d.meta;
+  const e = esc, p = d.profile, f = d.featured, m = d.meta, fn = Object.assign({}, DEFAULT.fonts, d.fonts || {});
+  const px = (v, def) => { const n = parseFloat(v); return (n > 0 ? n : def) + 'px'; };
+  const st = s => s ? ` style="${s}"` : '';
   const acc = /^#[0-9a-f]{3,8}$/i.test(p.accent) ? p.accent : '#E8432E';
   const ava = imgSrc(p.avatar);
 
@@ -310,15 +316,17 @@ function buildHTML(d, preview){
     </a>`;
 
   const renderLinkItem = l => {
+    const fsT = l.fsTitle > 0 ? `font-size:${+l.fsTitle}px` : '';
+    const fsD = l.fsDesc > 0 ? `font-size:${+l.fsDesc}px` : '';
     if(l.type === 'heading') return `
-    <h2 class="sec">${e(l.title)}</h2>`;
+    <h2 class="sec"${st(fsT)}>${e(l.title)}</h2>`;
     if(l.type === 'text') return `
-    <p class="note">${e(l.title)}</p>`;
+    <p class="note"${st(fsT)}>${e(l.title)}</p>`;
     const arrow = ARROWS[l.arrow || 'chevron'];
     return `
     <a class="btn link ${e(l.color || 'white')}" href="${e(safeUrl(l.url))}"${tgt(l.newTab)}>
       ${l.icon !== 'none' ? `<span class="ico">${sv(ICONS[l.icon] || ICONS.link)}</span>` : ''}
-      <span class="txt"><span class="t">${e(l.title)}${l.badge ? ` <span class="badge">${e(l.badge)}</span>` : ''}</span>${l.desc ? `<span class="s">${e(l.desc)}</span>` : ''}</span>
+      <span class="txt"><span class="t"${st(fsT)}>${e(l.title)}${l.badge ? ` <span class="badge">${e(l.badge)}</span>` : ''}</span>${l.desc ? `<span class="s"${st(fsD)}>${e(l.desc)}</span>` : ''}</span>
       ${arrow ? sv(arrow, 20, 2.6) : ''}
     </a>`;
   };
@@ -330,24 +338,84 @@ ${items}
   </section>` : '';
 
   const posts = d.latest.posts.filter(x => x.show);
-  const cLinks = (d.latest.links || []).filter(l => l.show).map(renderLinkItem).join('\n');
-  const latest = (!d.latest.show || (!posts.length && !cLinks)) ? '' : `
+  const renderPost = x => {
+    const img = imgSrc(x.image).replace(/["\\\n\r]/g,'');
+    const styles = [];
+    if(img) styles.push(`background-image:linear-gradient(to top,rgba(22,19,15,.85),rgba(22,19,15,0) 65%),url(&quot;${e(img)}&quot;)`);
+    if(x.fs > 0) styles.push(`font-size:${+x.fs}px`);
+    return `      <a class="btn post ${e(x.style || 'p1')}${img ? ' has-img' : ''}" href="${e(safeUrl(x.url))}"${tgt(x.newTab)}${st(styles.join(';'))}>${e(x.text)}${x.hl ? ` <em>${e(x.hl)}</em>` : ''}</a>`;
+  };
+  const topPosts = posts.slice(0, 3);
+  const allC = d.latest.links || [];
+  const visC = allC.filter(l => l.show);
+  const hasMorePosts = posts.length > 3;
+  let topC = visC, hasMoreC = false;
+  if(visC.length > 3){
+    topC = []; let cnt = 0;
+    for(const l of visC){
+      if(l.type !== 'heading' && l.type !== 'text'){
+        if(cnt >= 3){ hasMoreC = true; break; }
+        cnt++;
+      }
+      topC.push(l);
+    }
+  }
+  const hasMore = hasMorePosts || hasMoreC;
+  const moreLabel = d.latest.moreText || 'Show More Konten';
+  const moreCount = Math.max(0, posts.length - 3) + Math.max(0, visC.filter(l => l.type !== 'heading' && l.type !== 'text').length - 3);
+  const topCLinks = topC.map(renderLinkItem).join('\n');
+  const allCLinks = visC.map(renderLinkItem).join('\n');
+
+  const latest = (!d.latest.show || (!posts.length && !visC.length)) ? '' : `
   <section class="latest" aria-label="Konten terbaru">
     <div class="latest-head">
       <h2>${e(d.latest.heading)}</h2>
       ${d.latest.scribble ? `<span class="scribble">${e(d.latest.scribble)}</span>` : ''}
-    </div>${posts.length ? `
+    </div>${topPosts.length ? `
     <div class="grid">
-${posts.map(x => {
-  const img = imgSrc(x.image).replace(/["\\\n\r]/g,'');
-  const style = img ? ` style="background-image:linear-gradient(to top,rgba(22,19,15,.85),rgba(22,19,15,0) 65%),url(&quot;${e(img)}&quot;)"` : '';
-  return `      <a class="btn post ${e(x.style || 'p1')}${img ? ' has-img' : ''}" href="${e(safeUrl(x.url))}"${tgt(x.newTab)}${style}>${e(x.text)}${x.hl ? ` <em>${e(x.hl)}</em>` : ''}</a>`;
-}).join('\n')}
-    </div>` : ''}${cLinks ? `
+${topPosts.map(renderPost).join('\n')}
+    </div>` : ''}${topCLinks ? `
     <div class="links">
-${cLinks}
-    </div>` : ''}
+${topCLinks}
+    </div>` : ''}${hasMore ? `
+    <button type="button" class="btn more-btn" data-open-modal="moreModal">
+      <span>${e(moreLabel)}</span>
+      ${moreCount > 0 ? `<span class="more-cnt">+${moreCount}</span>` : ''}
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    </button>` : ''}
   </section>`;
+
+  const modalHTML = (!d.latest.show || !hasMore) ? '' : `
+<div class="modal-backdrop" id="moreModal" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-label="${e(d.latest.heading || 'Semua Konten')}">
+    <div class="modal-head">
+      <div>
+        <h2>${e(d.latest.heading || 'Semua Konten')}</h2>
+        ${d.latest.scribble ? `<span class="scribble">${e(d.latest.scribble)}</span>` : ''}
+      </div>
+      <button type="button" class="btn modal-close" data-close-modal aria-label="Tutup">✕</button>
+    </div>
+    <div class="modal-body">${posts.length ? `
+      <div class="grid">
+${posts.map(renderPost).join('\n')}
+      </div>` : ''}${allCLinks ? `
+      <div class="links">
+${allCLinks}
+      </div>` : ''}
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var m = document.getElementById('moreModal');
+  if(!m) return;
+  function open(){ m.classList.add('open'); m.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+  function close(){ m.classList.remove('open'); m.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+  document.querySelectorAll('[data-open-modal="moreModal"]').forEach(function(b){ b.addEventListener('click', open); });
+  m.addEventListener('click', function(e){ if(e.target === m || e.target.closest('[data-close-modal]')) close(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && m.classList.contains('open')) close(); });
+})();
+<\/script>`;
 
   const soc = d.social.items.filter(s => s.show && SOCIAL[s.platform]);
   const social = (!d.social.show || !soc.length) ? '' : `
@@ -412,13 +480,13 @@ ${soc.map(s => `    <a class="btn" href="${e(safeUrl(s.url))}" target="_blank" r
   .avatar img{width:100%;height:100%;object-fit:cover}
   .avatar-ph{font-family:'Anton',sans-serif;font-size:15px;letter-spacing:1px;background:#fff;border:2px solid var(--ink);padding:4px 8px;border-radius:6px}
   .name-block{display:flex;flex-direction:column;align-items:center;gap:6px}
-  h1{margin:0;font-family:'Anton',sans-serif;font-weight:400;font-size:56px;line-height:1;letter-spacing:1px;text-transform:uppercase}
+  h1{margin:0;font-family:'Anton',sans-serif;font-weight:400;font-size:${px(fn.name,56)};line-height:1;letter-spacing:1px;text-transform:uppercase}
   h1 span{color:var(--accent)}
   .tagline{
-    margin:0;font-family:'Anton',sans-serif;font-size:20px;letter-spacing:.5px;text-transform:uppercase;
+    margin:0;font-family:'Anton',sans-serif;font-size:${px(fn.tagline,20)};letter-spacing:.5px;text-transform:uppercase;
     background:var(--ink);color:var(--yellow);padding:4px 12px;border-radius:6px;transform:rotate(-1.5deg);
   }
-  .bio{margin:4px 0 0;font-size:16px;line-height:1.5;font-weight:600;max-width:360px}
+  .bio{margin:4px 0 0;font-size:${px(fn.bio,16)};line-height:1.5;font-weight:600;max-width:360px}
 
   /* ---------- Buttons ---------- */
   .links{display:flex;flex-direction:column;gap:16px}
@@ -432,13 +500,13 @@ ${soc.map(s => `    <a class="btn" href="${e(safeUrl(s.url))}" target="_blank" r
     border:3px solid var(--ink);border-radius:18px;background:var(--accent);color:#fff;box-shadow:var(--shadow);
   }
   .sticker{
-    position:absolute;top:-14px;right:16px;font-family:'Permanent Marker',cursive;font-size:15px;color:var(--ink);
+    position:absolute;top:-14px;right:16px;font-family:'Permanent Marker',cursive;font-size:${px(fn.featSticker,15)};color:var(--ink);
     background:var(--yellow);border:2px solid var(--ink);padding:2px 10px;border-radius:999px;transform:rotate(4deg);
   }
-  .featured .kicker{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#FFE3DC}
-  .featured .title{font-family:'Anton',sans-serif;font-size:34px;line-height:1.05;text-transform:uppercase}
+  .featured .kicker{display:flex;align-items:center;gap:10px;font-size:${px(fn.featKicker,13)};font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#FFE3DC}
+  .featured .title{font-family:'Anton',sans-serif;font-size:${px(fn.featTitle,34)};line-height:1.05;text-transform:uppercase}
   .featured .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px}
-  .featured .url{font-size:14px;font-weight:600;color:#FFE3DC}
+  .featured .url{font-size:${px(fn.featUrl,14)};font-weight:600;color:#FFE3DC}
   .featured .go{width:44px;height:44px;flex:none;border-radius:50%;background:#fff;border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;color:var(--ink)}
 
   .link{
@@ -447,8 +515,8 @@ ${soc.map(s => `    <a class="btn" href="${e(safeUrl(s.url))}" target="_blank" r
   }
   .link .ico{width:44px;height:44px;flex:none;border-radius:12px;background:var(--yellow);border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;color:var(--ink)}
   .link .txt{flex:1;display:flex;flex-direction:column;gap:2px}
-  .link .t{font-family:'Anton',sans-serif;font-size:22px;text-transform:uppercase;letter-spacing:.3px}
-  .link .s{font-size:13px;font-weight:600}
+  .link .t{font-family:'Anton',sans-serif;font-size:${px(fn.linkTitle,22)};text-transform:uppercase;letter-spacing:.3px}
+  .link .s{font-size:${px(fn.linkDesc,13)};font-weight:600}
   .link.teal{background:var(--teal);color:#fff}.link.teal .s{color:#CDE7E2}
   .link.navy{background:var(--navy);color:#fff}.link.navy .s{color:#D6D3F5}
   .link.white{background:#fff;color:var(--ink)}.link.white .s{color:#4A443B}
@@ -459,20 +527,20 @@ ${soc.map(s => `    <a class="btn" href="${e(safeUrl(s.url))}" target="_blank" r
   .link.accent{background:var(--accent);color:#fff}.link.accent .s{color:rgba(255,255,255,.85)}
   .badge{font-family:'Archivo',sans-serif;font-size:11px;font-weight:800;letter-spacing:1px;vertical-align:middle;background:var(--yellow);color:var(--ink);border:2px solid var(--ink);border-radius:999px;padding:1px 8px;margin-left:4px;position:relative;top:-2px}
   .link.yellow .badge{background:#fff}
-  .sec{margin:10px 0 -4px;font-family:'Anton',sans-serif;font-weight:400;font-size:24px;text-transform:uppercase;display:flex;align-items:center;gap:12px}
+  .sec{margin:10px 0 -4px;font-family:'Anton',sans-serif;font-weight:400;font-size:${px(fn.secHeading,24)};text-transform:uppercase;display:flex;align-items:center;gap:12px}
   .sec::before,.sec::after{content:"";flex:1;height:3px;background:var(--ink);border-radius:3px}
-  .note{margin:0;text-align:center;font-size:15px;font-weight:600;line-height:1.5}
+  .note{margin:0;text-align:center;font-size:${px(fn.noteText,15)};font-weight:600;line-height:1.5}
 
   /* ---------- Konten terbaru ---------- */
   .latest{display:flex;flex-direction:column;gap:14px}
   .latest-head{display:flex;align-items:center;gap:10px}
-  h2{margin:0;font-family:'Anton',sans-serif;font-weight:400;font-size:26px;text-transform:uppercase}
-  .scribble{font-family:'Permanent Marker',cursive;font-size:15px;color:var(--accent);transform:rotate(-3deg)}
+  h2{margin:0;font-family:'Anton',sans-serif;font-weight:400;font-size:${px(fn.latestHeading,26)};text-transform:uppercase}
+  .scribble{font-family:'Permanent Marker',cursive;font-size:${px(fn.latestScribble,15)};color:var(--accent);transform:rotate(-3deg)}
   .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
   .post{
     aspect-ratio:4/5;padding:10px;border:3px solid var(--ink);border-radius:12px;box-shadow:4px 4px 0 var(--ink);
     display:flex;flex-direction:column;justify-content:flex-end;
-    font-family:'Anton',sans-serif;font-size:15px;line-height:1.05;text-transform:uppercase;
+    font-family:'Anton',sans-serif;font-size:${px(fn.postTitle,15)};line-height:1.05;text-transform:uppercase;
     background-size:cover;background-position:center;
   }
   .post.p1{background-color:var(--navy);color:#fff}.post.p1 em{color:var(--yellow)}
@@ -484,16 +552,58 @@ ${soc.map(s => `    <a class="btn" href="${e(safeUrl(s.url))}" target="_blank" r
   .post.has-img{color:#fff}.post.has-img em{color:var(--yellow)}
   .post em{font-style:normal}
 
+  .more-btn{
+    width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+    padding:13px 18px;border:3px solid var(--ink);border-radius:14px;
+    background:var(--yellow);color:var(--ink);box-shadow:var(--shadow);
+    font-family:'Anton',sans-serif;font-size:${px(fn.moreBtn,20)};letter-spacing:.5px;text-transform:uppercase;cursor:pointer;
+  }
+  .more-cnt{
+    font-family:'Archivo',sans-serif;font-size:12px;font-weight:800;
+    background:var(--ink);color:var(--yellow);padding:2px 8px;border-radius:999px;
+  }
+
+  /* ---------- Modal Popup Show More ---------- */
+  .modal-backdrop{
+    position:fixed;inset:0;z-index:100;
+    background:rgba(22,19,15,.45);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    display:flex;align-items:center;justify-content:center;padding:20px;
+    opacity:0;pointer-events:none;transition:opacity .2s ease;
+  }
+  .modal-backdrop.open{opacity:1;pointer-events:auto}
+  .modal-box{
+    width:100%;max-width:460px;max-height:85vh;
+    background:var(--cream);border:4px solid var(--ink);border-radius:22px;
+    box-shadow:8px 8px 0 var(--ink);
+    display:flex;flex-direction:column;overflow:hidden;
+    transform:translateY(16px) scale(.97);transition:transform .2s ease;
+  }
+  .modal-backdrop.open .modal-box{transform:translateY(0) scale(1)}
+  .modal-head{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:16px 18px;border-bottom:3px solid var(--ink);background:#FFFBF0;
+  }
+  .modal-head>div{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .modal-close{
+    width:38px;height:38px;border-radius:50%;border:3px solid var(--ink);
+    background:var(--red);color:#fff;box-shadow:3px 3px 0 var(--ink);
+    font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;
+  }
+  .modal-body{
+    padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;
+  }
+
   /* ---------- Sosmed & footer ---------- */
   .social{display:flex;justify-content:center;flex-wrap:wrap;gap:14px}
   .social a{width:52px;height:52px;border-radius:50%;border:3px solid var(--ink);background:#fff;box-shadow:3px 3px 0 var(--ink);display:flex;align-items:center;justify-content:center;color:var(--ink)}
-  footer{text-align:center;font-size:13px;font-weight:600;color:#4A443B}
+  footer{text-align:center;font-size:${px(fn.footer,13)};font-weight:600;color:#4A443B}
 
   @media (max-width:380px){
-    h1{font-size:48px}
-    .featured .title{font-size:30px}
-    .link .t{font-size:20px}
-    .post{font-size:13px}
+    h1{font-size:${px(Math.round((fn.name||56)*0.86),48)}}
+    .featured .title{font-size:${px(Math.round((fn.featTitle||34)*0.88),30)}}
+    .link .t{font-size:${px(Math.round((fn.linkTitle||22)*0.9),20)}}
+    .post{font-size:${px(Math.round((fn.postTitle||15)*0.87),13)}}
   }
   @media (prefers-reduced-motion:reduce){.btn{transition:none}}
 </style>
@@ -512,7 +622,7 @@ ${linksSec}
 ${latest}
 ${social}
 ${d.footer ? `\n  <footer>${e(d.footer)}</footer>` : ''}
-</main>${dataBlock}
+</main>${modalHTML}${dataBlock}
 </body>
 </html>
 `;
@@ -525,6 +635,10 @@ function F(label, path, o = {}){
   const v = get(path) ?? '';
   const t = o.type || 'text';
   if(t === 'check') return `<label class="chk"><input type="checkbox" data-path="${path}"${v ? ' checked' : ''}><span>${label}</span></label>`;
+  if(t === 'range'){
+    const def = o.def ?? 16, cur = v !== '' && v > 0 ? +v : def, isCustom = v !== '' && v > 0 && +v !== def;
+    return `<label class="fld"><span>${label}</span><div class="rng"><input type="range" data-path="${path}" min="${o.min || 10}" max="${o.max || 80}" step="1" value="${cur}"><b data-val>${cur}px</b>${o.reset && isCustom ? `<button type="button" class="b sm" data-act="set" data-path="${path}" data-v="" title="Ikut ukuran default">Auto</button>` : ''}</div>${o.hint ? `<small>${o.hint}</small>` : ''}</label>`;
+  }
   let input;
   if(t === 'textarea') input = `<textarea data-path="${path}" rows="${o.rows || 3}" placeholder="${esc(o.ph || '')}">${esc(v)}</textarea>`;
   else if(t === 'select') input = `<select data-path="${path}">${o.options.map(([val, lab]) => `<option value="${esc(val)}"${val === v ? ' selected' : ''}>${esc(lab)}</option>`).join('')}</select>`;
@@ -572,8 +686,8 @@ function linkItem(l, i, n, listPath = 'links'){
     sw = `<span class="sw" style="background:var(--cream)">${l.type === 'heading' ? 'H' : 'T'}</span>`;
     sub = l.type === 'heading' ? 'Judul seksi' : 'Teks / catatan';
     body = l.type === 'heading'
-      ? F('Judul seksi', `${base}.title`, {ph:'contoh: PRODUK GUE'})
-      : F('Teks', `${base}.title`, {type:'textarea', rows:2, ph:'Teks pendek di antara tombol'});
+      ? F('Judul seksi', `${base}.title`, {ph:'contoh: PRODUK GUE'}) + F('Ukuran font judul seksi', `${base}.fsTitle`, {type:'range', min:14, max:42, def:S.fonts.secHeading||24, reset:true})
+      : F('Teks', `${base}.title`, {type:'textarea', rows:2, ph:'Teks pendek di antara tombol'}) + F('Ukuran font teks', `${base}.fsTitle`, {type:'range', min:11, max:28, def:S.fonts.noteText||15, reset:true});
   } else {
     const c = LINK_COLORS[l.color] || LINK_COLORS.white;
     sw = `<span class="sw" style="background:${c.bg || S.profile.accent};color:${c.fg}">${l.icon === 'none' ? '' : sv(ICONS[l.icon] || ICONS.link, 18)}</span>`;
@@ -582,6 +696,7 @@ function linkItem(l, i, n, listPath = 'links'){
       <div class="grid2">${F('Judul tombol', `${base}.title`, {ph:'contoh: Ebook Program Gym'})}${F('Label kecil (opsional)', `${base}.badge`, {ph:'NEW / PROMO / GRATIS', max:14})}</div>
       ${F('Deskripsi singkat (opsional)', `${base}.desc`, {ph:'Kalimat pendek di bawah judul'})}
       ${F('URL / Link tujuan', `${base}.url`, {type:'url', ph:'https://...  ·  mailto:...  ·  https://wa.me/62...', hint:'Kalau lupa tulis https://, otomatis ditambahin.'})}
+      <div class="grid2">${F('Ukuran font judul (khusus item ini)', `${base}.fsTitle`, {type:'range', min:14, max:36, def:S.fonts.linkTitle||22, reset:true})}${F('Ukuran font deskripsi (khusus item ini)', `${base}.fsDesc`, {type:'range', min:10, max:22, def:S.fonts.linkDesc||13, reset:true})}</div>
       ${colorPicker(`${base}.color`, LINK_COLORS, 'Warna tombol')}
       ${iconPicker(`${base}.icon`, true)}
       <div class="grid2">${F('Panah kanan', `${base}.arrow`, {type:'select', options:[['chevron','› Chevron'],['diag','↗ Diagonal'],['none','Tanpa panah']]})}<div></div></div>
@@ -603,6 +718,8 @@ function tabLinks(){
     <div class="grid2">${F('Stiker', `${f}.sticker`, {ph:'Mulai di sini!'})}${F('Kicker (teks kecil)', `${f}.kicker`, {ph:'Program pemula'})}</div>
     ${F('Judul besar', `${f}.title`, {type:'textarea', rows:2})}
     <div class="grid2">${F('URL tujuan', `${f}.url`, {type:'url', ph:'https://...'})}${F('Teks URL yang ditampilkan', `${f}.displayUrl`, {ph:autoDisp(S.featured.url) || 'otomatis dari URL'})}</div>
+    <div class="grid2">${F('Ukuran font judul besar', 'fonts.featTitle', {type:'range', min:20, max:52, def:34})}${F('Ukuran font stiker', 'fonts.featSticker', {type:'range', min:11, max:26, def:15})}</div>
+    <div class="grid2">${F('Ukuran font kicker', 'fonts.featKicker', {type:'range', min:10, max:22, def:13})}${F('Ukuran font teks URL', 'fonts.featUrl', {type:'range', min:10, max:22, def:14})}</div>
     ${iconPicker(`${f}.icon`)}
     ${F('Buka di tab baru', `${f}.newTab`, {type:'check'})}` : ''}
   </section>
@@ -610,6 +727,7 @@ function tabLinks(){
   <section class="card">
     <h3>Link custom <span class="scr">${S.links.length} item</span></h3>
     <p class="sub">Klik item buat edit. Pakai tombol ↑ ↓ buat atur urutan.</p>
+    <div class="grid2">${F('Ukuran font judul semua link', 'fonts.linkTitle', {type:'range', min:14, max:34, def:22})}${F('Ukuran font deskripsi semua link', 'fonts.linkDesc', {type:'range', min:10, max:22, def:13})}</div>
     ${S.links.length ? S.links.map((l, i) => linkItem(l, i, S.links.length)).join('') : '<div class="empty">Belum ada link. Tambahin di bawah 👇</div>'}
     <div class="add-row">
       <button class="b red" data-act="addLink">+ Tambah link</button>
@@ -632,8 +750,11 @@ function tabProfile(){
       <div style="flex:1;min-width:220px">${imgField('Foto profil', 'profile.avatar', 360, true)}</div>
     </div>
     <div class="grid2">${F('Nama (hitam)', 'profile.name1', {ph:'Lebih'})}${F('Nama (warna aksen)', 'profile.name2', {ph:'Fit'})}</div>
+    ${F('Ukuran font nama utama', 'fonts.name', {type:'range', min:32, max:84, def:56})}
     ${F('Tagline', 'profile.tagline', {ph:'Bantu lo latihan gym & WO'})}
+    ${F('Ukuran font tagline', 'fonts.tagline', {type:'range', min:12, max:32, def:20})}
     ${F('Bio', 'profile.bio', {type:'textarea', rows:3})}
+    ${F('Ukuran font bio', 'fonts.bio', {type:'range', min:12, max:26, def:16})}
   </section>
 
   <section class="card">
@@ -648,6 +769,31 @@ function tabProfile(){
   <section class="card">
     <h3>Footer</h3>
     ${F('Teks footer', 'footer', {ph:'@lebihfit · Latihan bener, hasil kelihatan'})}
+    ${F('Ukuran font footer', 'fonts.footer', {type:'range', min:10, max:22, def:13})}
+  </section>
+
+  <section class="card">
+    <h3>Ukuran font semua komponen <span class="scr">ringkasan</span></h3>
+    <p class="sub">Atur cepat ukuran font semua elemen dari satu tempat (atau atur spesifik per item di tab Link & Konten).</p>
+    <div class="grid2">
+      ${F('Nama profil', 'fonts.name', {type:'range', min:32, max:84, def:56})}
+      ${F('Tagline', 'fonts.tagline', {type:'range', min:12, max:32, def:20})}
+      ${F('Bio', 'fonts.bio', {type:'range', min:12, max:26, def:16})}
+      ${F('Link utama: Judul', 'fonts.featTitle', {type:'range', min:20, max:52, def:34})}
+      ${F('Link utama: Stiker', 'fonts.featSticker', {type:'range', min:11, max:26, def:15})}
+      ${F('Link utama: Kicker', 'fonts.featKicker', {type:'range', min:10, max:22, def:13})}
+      ${F('Link utama: URL', 'fonts.featUrl', {type:'range', min:10, max:22, def:14})}
+      ${F('Tombol link: Judul', 'fonts.linkTitle', {type:'range', min:14, max:34, def:22})}
+      ${F('Tombol link: Deskripsi', 'fonts.linkDesc', {type:'range', min:10, max:22, def:13})}
+      ${F('Judul seksi (H2)', 'fonts.secHeading', {type:'range', min:14, max:42, def:24})}
+      ${F('Teks catatan', 'fonts.noteText', {type:'range', min:11, max:28, def:15})}
+      ${F('Konten: Judul seksi', 'fonts.latestHeading', {type:'range', min:16, max:42, def:26})}
+      ${F('Konten: Coretan', 'fonts.latestScribble', {type:'range', min:11, max:28, def:15})}
+      ${F('Kartu konten: Teks', 'fonts.postTitle', {type:'range', min:11, max:28, def:15})}
+      ${F('Tombol Show More', 'fonts.moreBtn', {type:'range', min:14, max:32, def:20})}
+      ${F('Footer', 'fonts.footer', {type:'range', min:10, max:22, def:13})}
+    </div>
+    <div class="add-row"><button class="b sm" data-act="resetFonts">↺ Reset semua ukuran font ke default</button></div>
   </section>`;
 }
 
@@ -659,6 +805,7 @@ function postItem(x, i, n){
     <div class="body">
       ${F('🔗 Link / URL Konten (Reels / TikTok / YouTube)', `${base}.url`, {type:'url', ph:'https://www.instagram.com/reel/...', hint:'Tempel link video IG Reels, TikTok, atau YouTube Shorts lo di sini.'})}
       <div class="grid2">${F('Teks baris 1', `${base}.text`, {ph:'Latihan tiap hari'})}${F('Teks highlight (warna kuning/kontras)', `${base}.hl`, {ph:'otot mengecil?!'})}</div>
+      ${F('Ukuran font kartu ini', `${base}.fs`, {type:'range', min:11, max:28, def:S.fonts.postTitle||15, reset:true})}
       ${colorPicker(`${base}.style`, POST_STYLES, 'Warna kartu')}
       ${imgField('Gambar thumbnail (opsional)', `${base}.image`, 600, false)}
       ${F('Buka di tab baru', `${base}.newTab`, {type:'check'})}
@@ -669,20 +816,23 @@ function tabContent(){
   const L = S.latest, cLinks = L.links || [];
   return `
   <section class="card">
-    <h3>Konten terbaru <span class="scr">grid & link</span></h3>
-    <p class="sub">Promoin video/postingan terbaru lo + tambahin tombol link konten di bawahnya.</p>
+    <h3>Konten terbaru <span class="scr">3 terbaru + popup</span></h3>
+    <p class="sub">Di halaman utama otomatis cuma tampil <b>3 terbaru</b> (paling atas). Kalau ada lebih dari 3, otomatis muncul tombol <b>Show More Konten</b> yang ngebuka pop-up dengan background blur tipis.</p>
     ${F('Tampilkan seksi konten terbaru', 'latest.show', {type:'check'})}
     <div class="grid2">${F('Judul seksi', 'latest.heading', {ph:'Konten terbaru'})}${F('Coretan', 'latest.scribble', {ph:'wajib tonton!'})}</div>
+    <div class="grid2">${F('Ukuran font judul seksi', 'fonts.latestHeading', {type:'range', min:16, max:42, def:26})}${F('Ukuran font coretan', 'fonts.latestScribble', {type:'range', min:11, max:28, def:15})}</div>
+    <div class="grid2">${F('Teks tombol Show More', 'latest.moreText', {ph:'Show More Konten', hint:'Muncul kalau konten > 3.'})}${F('Ukuran font tombol Show More', 'fonts.moreBtn', {type:'range', min:14, max:32, def:20})}</div>
   </section>
   <section class="card">
     <h3>Kartu konten (Grid 3 kolom) <span class="scr">${L.posts.length} kartu</span></h3>
-    <p class="sub">Klik kartu di bawah buat isi <b>Link URL</b>, judul, warna, atau gambar thumbnail.</p>
+    <p class="sub">Urutan <b>#1–#3</b> tampil di halaman depan. Urutan <b>#4 dst</b> ikut muncul di dalam pop-up Show More. Klik tombol <b>+ Tambah kartu konten</b> buat naruh konten paling baru di urutan #1.</p>
+    ${F('Ukuran font semua kartu konten', 'fonts.postTitle', {type:'range', min:11, max:28, def:15})}
     ${L.posts.length ? L.posts.map((x, i) => postItem(x, i, L.posts.length)).join('') : '<div class="empty">Belum ada kartu konten.</div>'}
-    <div class="add-row"><button class="b red" data-act="addPost">+ Tambah kartu konten</button></div>
+    <div class="add-row"><button class="b red" data-act="addPost">+ Tambah kartu konten terbaru</button></div>
   </section>
   <section class="card">
     <h3>Link di seksi konten <span class="scr">${cLinks.length} link</span></h3>
-    <p class="sub">Tombol link tambahan yang muncul tepat di bawah grid konten terbaru (misal: "Tonton Semua Video", link playlist, dll).</p>
+    <p class="sub">3 link teratas tampil di halaman depan, sisanya muncul di pop-up Show More.</p>
     ${cLinks.length ? cLinks.map((l, i) => linkItem(l, i, cLinks.length, 'latest.links')).join('') : '<div class="empty">Belum ada tombol link di seksi konten.</div>'}
     <div class="add-row">
       <button class="b red" data-act="addContentLink">+ Tambah link konten</button>
@@ -800,9 +950,11 @@ function updatePreview(){
 function newLink(type){
   return {id:uid(), type, show:true, title: type === 'heading' ? 'Judul seksi' : type === 'text' ? 'Teks catatan' : 'Link baru', desc:'', url:'', color:'white', icon:'link', arrow:'chevron', newTab:false, badge:''};
 }
-function addTo(list, item){
-  get(list).push(item); OPEN.add(item.id); commit(true);
-  requestAnimationFrame(() => { const el = document.querySelector(`[data-id="${item.id}"]`); if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); const inp = el.querySelector('input[type=text],textarea'); if(inp) inp.focus({preventScroll:true}); } });
+function addTo(list, item, top){
+  const arr = get(list);
+  top ? arr.unshift(item) : arr.push(item);
+  OPEN.add(item.id); commit(true);
+  requestAnimationFrame(() => { const el = document.querySelector(`[data-id="${item.id}"]`); if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); const inp = el.querySelector('input[type=text],input[type=url],textarea'); if(inp) inp.focus({preventScroll:true}); } });
 }
 function download(name, content, type){
   const a = document.createElement('a');
@@ -827,8 +979,8 @@ const ACTIONS = {
   addLink: () => addTo('links', newLink('link')),
   addHeading: () => addTo('links', newLink('heading')),
   addText: () => addTo('links', newLink('text')),
-  addPost: () => addTo('latest.posts', {id:uid(), show:true, text:'Judul konten', hl:'', url:'', style:'p1', image:'', newTab:false}),
-  addContentLink: () => addTo('latest.links', newLink('link')),
+  addPost: () => addTo('latest.posts', {id:uid(), show:true, text:'Judul konten', hl:'', url:'', style:'p1', image:'', newTab:false}, true),
+  addContentLink: () => addTo('latest.links', newLink('link'), true),
   addContentHeading: () => addTo('latest.links', newLink('heading')),
   addContentText: () => addTo('latest.links', newLink('text')),
   addSocial: () => { const used = S.social.items.map(s => s.platform); const p = Object.keys(SOCIAL).find(k => !used.includes(k)) || 'website'; addTo('social.items', {id:uid(), show:true, platform:p, url:''}); },
@@ -839,6 +991,7 @@ const ACTIONS = {
   togglePrev: () => document.body.classList.toggle('show-prev'),
   exportJSON: () => { download('lebihfit-backup-' + new Date().toISOString().slice(0,10) + '.json', JSON.stringify(S, null, 2), 'application/json'); toast('✓ Backup di-download'); },
   import: () => $('#importFile').click(),
+  resetFonts: () => { S.fonts = clone(DEFAULT.fonts); [...S.links, ...S.latest.posts, ...(S.latest.links||[])].forEach(x => { delete x.fsTitle; delete x.fsDesc; delete x.fs; }); commit(true); toast('✓ Ukuran font di-reset ke default'); },
   reset: () => { if(confirm('Reset semua data ke kondisi awal? Data sekarang bakal hilang.')){ S = normalize(clone(DEFAULT)); S.links.forEach(l => l.id = uid()); commit(true); toast('Data di-reset'); } }
 };
 function move(el, dir){
@@ -861,7 +1014,8 @@ panel.addEventListener('input', e => {
   if(el.dataset.gh){ GH[el.dataset.gh] = el.value.trim(); saveGH(); return; }
   if(el.dataset.ghChk){ GH[el.dataset.ghChk] = el.checked; saveGH(); if(el.checked) scheduleAutoPub(); return; }
   if(!p || el.type === 'file') return;
-  set(p, el.type === 'checkbox' ? el.checked : el.value);
+  set(p, el.type === 'checkbox' ? el.checked : el.type === 'range' ? +el.value : el.value);
+  if(el.type === 'range'){ const vb = el.parentElement.querySelector('[data-val]'); if(vb) vb.textContent = el.value + 'px'; }
   // update judul item tanpa re-render (biar fokus input nggak hilang)
   const item = el.closest('.item');
   if(item && /\.(title|text|hl)$/.test(p)){
@@ -882,6 +1036,8 @@ panel.addEventListener('change', async e => {
       const url = await resizeImage(el.files[0], +el.dataset.max || 600, !!el.dataset.square);
       set(el.dataset.upload, url); commit(true); toast('✓ Gambar di-upload');
     }catch(err){ toast('Gagal baca gambar'); }
+  } else if(el.type === 'range'){
+    render();
   }
 });
 panel.addEventListener('toggle', e => {
