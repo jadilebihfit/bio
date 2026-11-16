@@ -232,12 +232,15 @@ const DEFAULT = {
     {id:uid(),show:true,text:'Dada gede',hl:'tanpa ke gym?!',url:'#',style:'p2',image:''},
     {id:uid(),show:true,text:'Otot lo harus',hl:'dirobek?!',url:'#',style:'p3',image:''}
   ],links:[]},
+  affiliate:{show:true,heading:'Rekomendasi Produk',scribble:'andalan gue!',moreText:'Lihat Semua Produk',items:[
+    {id:uid(),show:true,title:'Whey Protein Isolate',desc:'Protein tinggi, rendah kalori & gampang larut',price:'Rp 299.000',badge:'BEST SELLER',cta:'Beli',url:'#',color:'white',image:'',newTab:true}
+  ]},
   social:{show:true,items:[
     {id:uid(),show:true,platform:'instagram',url:'https://www.instagram.com/lebihfit/'},
     {id:uid(),show:true,platform:'tiktok',url:'#'},
     {id:uid(),show:true,platform:'youtube',url:'#'}
   ]},
-  fonts:{name:56,tagline:20,bio:16,featSticker:15,featKicker:13,featTitle:34,featUrl:14,linkTitle:22,linkDesc:13,secHeading:24,noteText:15,latestHeading:26,latestScribble:15,postTitle:15,moreBtn:20,footer:13},
+  fonts:{name:56,tagline:20,bio:16,featSticker:15,featKicker:13,featTitle:34,featUrl:14,linkTitle:22,linkDesc:13,secHeading:24,noteText:15,latestHeading:26,latestScribble:15,postTitle:15,moreBtn:20,affHeading:26,affScribble:15,affTitle:19,affDesc:12,affPrice:14,footer:13},
   footer:'@lebihfit · Latihan bener, hasil kelihatan'
 };
 
@@ -251,12 +254,14 @@ function normalize(d){
   const out = Object.assign(base, d || {});
   ['meta','profile','featured','fonts'].forEach(k => out[k] = Object.assign(clone(DEFAULT[k]), (d||{})[k] || {}));
   out.latest = Object.assign(clone(DEFAULT.latest), (d||{}).latest || {});
+  out.affiliate = Object.assign(clone(DEFAULT.affiliate), (d||{}).affiliate || {});
   out.social = Object.assign(clone(DEFAULT.social), (d||{}).social || {});
   ['links'].forEach(k => { if(!Array.isArray(out[k])) out[k] = clone(DEFAULT[k]); });
   if(!Array.isArray(out.latest.posts)) out.latest.posts = [];
   if(!Array.isArray(out.latest.links)) out.latest.links = [];
+  if(!Array.isArray(out.affiliate.items)) out.affiliate.items = [];
   if(!Array.isArray(out.social.items)) out.social.items = [];
-  [...out.links, ...out.latest.posts, ...out.latest.links, ...out.social.items].forEach(x => { if(!x.id) x.id = uid(); if(x.show === undefined) x.show = true; });
+  [...out.links, ...out.latest.posts, ...out.latest.links, ...out.affiliate.items, ...out.social.items].forEach(x => { if(!x.id) x.id = uid(); if(x.show === undefined) x.show = true; });
   return out;
 }
 function load(){ try{ const raw = localStorage.getItem(STORE_KEY); return normalize(raw ? JSON.parse(raw) : null); }catch(e){ return normalize(null); } }
@@ -404,18 +409,80 @@ ${allCLinks}
       </div>` : ''}
     </div>
   </div>
-</div>
+</div>`;
+
+  const aff = d.affiliate || DEFAULT.affiliate;
+  const affItems = (aff.items || []).filter(x => x.show);
+  const renderAff = x => {
+    const img = imgSrc(x.image);
+    const fsT = x.fsTitle > 0 ? `font-size:${+x.fsTitle}px` : '';
+    const fsD = x.fsDesc > 0 ? `font-size:${+x.fsDesc}px` : '';
+    const fsP = x.fsPrice > 0 ? `font-size:${+x.fsPrice}px` : '';
+    return `      <a class="btn prod ${e(x.color || 'white')}" href="${e(safeUrl(x.url))}"${tgt(x.newTab !== false)}>
+        <span class="prod-img">${img ? `<img src="${e(img)}" alt="${e(x.title)}">` : sv(ICONS.cart, 26)}</span>
+        <span class="prod-txt">
+          <span class="prod-top">
+            <span class="prod-t"${st(fsT)}>${e(x.title)}${x.badge ? ` <span class="badge">${e(x.badge)}</span>` : ''}</span>
+          </span>
+          ${x.desc ? `<span class="prod-d"${st(fsD)}>${e(x.desc)}</span>` : ''}
+          ${x.price ? `<span class="prod-p"${st(fsP)}>${e(x.price)}</span>` : ''}
+        </span>
+        <span class="prod-cta">${e(x.cta || 'Beli')} ↗</span>
+      </a>`;
+  };
+  const topAff = affItems.slice(0, 3);
+  const hasMoreAff = affItems.length > 3;
+  const affMoreCount = Math.max(0, affItems.length - 3);
+  const affMoreLabel = aff.moreText || 'Lihat Semua Produk';
+
+  const affiliateSec = (!aff.show || !affItems.length) ? '' : `
+  <section class="latest aff-sec" aria-label="Affiliate Produk">
+    <div class="latest-head">
+      <h2>${e(aff.heading || 'Rekomendasi Produk')}</h2>
+      ${aff.scribble ? `<span class="scribble">${e(aff.scribble)}</span>` : ''}
+    </div>
+    <div class="prod-list">
+${topAff.map(renderAff).join('\n')}
+    </div>${hasMoreAff ? `
+    <button type="button" class="btn more-btn" data-open-modal="affModal">
+      <span>${e(affMoreLabel)}</span>
+      <span class="more-cnt">+${affMoreCount}</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.5L21 8H6"/></svg>
+    </button>` : ''}
+  </section>`;
+
+  const affModalHTML = (!aff.show || !hasMoreAff) ? '' : `
+<div class="modal-backdrop" id="affModal" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-label="${e(aff.heading || 'Semua Produk')}">
+    <div class="modal-head">
+      <div>
+        <h2>${e(aff.heading || 'Semua Produk')}</h2>
+        ${aff.scribble ? `<span class="scribble">${e(aff.scribble)}</span>` : ''}
+      </div>
+      <button type="button" class="btn modal-close" data-close-modal aria-label="Tutup">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="prod-list">
+${affItems.map(renderAff).join('\n')}
+      </div>
+    </div>
+  </div>
+</div>`;
+
+  const modalScript = (modalHTML || affModalHTML) ? `
 <script>
 (function(){
-  var m = document.getElementById('moreModal');
-  if(!m) return;
-  function open(){ m.classList.add('open'); m.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
-  function close(){ m.classList.remove('open'); m.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
-  document.querySelectorAll('[data-open-modal="moreModal"]').forEach(function(b){ b.addEventListener('click', open); });
-  m.addEventListener('click', function(e){ if(e.target === m || e.target.closest('[data-close-modal]')) close(); });
-  document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && m.classList.contains('open')) close(); });
+  function open(id){ var m = document.getElementById(id); if(!m) return; m.classList.add('open'); m.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+  function close(m){ m.classList.remove('open'); m.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+  document.querySelectorAll('[data-open-modal]').forEach(function(b){ b.addEventListener('click', function(){ open(b.getAttribute('data-open-modal')); }); });
+  document.querySelectorAll('.modal-backdrop').forEach(function(m){
+    m.addEventListener('click', function(e){ if(e.target === m || e.target.closest('[data-close-modal]')) close(m); });
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') document.querySelectorAll('.modal-backdrop.open').forEach(close);
+  });
 })();
-<\/script>`;
+<\/script>` : '';
 
   const soc = d.social.items.filter(s => s.show && SOCIAL[s.platform]);
   const social = (!d.social.show || !soc.length) ? '' : `
@@ -563,6 +630,40 @@ ${soc.map(s => `    <a class="btn" href="${e(safeUrl(s.url))}" target="_blank" r
     background:var(--ink);color:var(--yellow);padding:2px 8px;border-radius:999px;
   }
 
+  /* ---------- Affiliate Produk ---------- */
+  .aff-sec h2{font-size:${px(fn.affHeading,26)}}
+  .aff-sec .scribble{font-size:${px(fn.affScribble,15)}}
+  .prod-list{display:flex;flex-direction:column;gap:12px}
+  .prod{
+    display:flex;align-items:center;gap:12px;padding:12px;
+    border:3px solid var(--ink);border-radius:16px;box-shadow:var(--shadow);
+  }
+  .prod.white{background:#fff;color:var(--ink)}.prod.white .prod-d{color:#4A443B}
+  .prod.cream{background:#F9E7B8;color:var(--ink)}.prod.cream .prod-d{color:#4A443B}
+  .prod.yellow{background:var(--yellow);color:var(--ink)}.prod.yellow .prod-d{color:#4A443B}.prod.yellow .prod-cta{background:#fff;color:var(--ink)}
+  .prod.teal{background:var(--teal);color:#fff}.prod.teal .prod-d{color:#CDE7E2}.prod.teal .prod-p{background:var(--yellow);color:var(--ink)}
+  .prod.navy{background:var(--navy);color:#fff}.prod.navy .prod-d{color:#D6D3F5}.prod.navy .prod-p{background:var(--yellow);color:var(--ink)}
+  .prod.red{background:var(--red);color:#fff}.prod.red .prod-d{color:#FFE3DC}.prod.red .prod-p{background:var(--yellow);color:var(--ink)}
+  .prod.ink{background:var(--ink);color:var(--cream)}.prod.ink .prod-d{color:#CFC6AE}.prod.ink .prod-p{background:var(--yellow);color:var(--ink)}
+  .prod.accent{background:var(--accent);color:#fff}.prod.accent .prod-d{color:rgba(255,255,255,.85)}.prod.accent .prod-p{background:var(--yellow);color:var(--ink)}
+  .prod-img{
+    width:62px;height:62px;flex:none;border-radius:12px;border:2px solid var(--ink);
+    background:var(--yellow);color:var(--ink);display:flex;align-items:center;justify-content:center;overflow:hidden;
+  }
+  .prod-img img{width:100%;height:100%;object-fit:cover;display:block}
+  .prod-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+  .prod-t{font-family:'Anton',sans-serif;font-size:${px(fn.affTitle,19)};line-height:1.1;text-transform:uppercase;letter-spacing:.3px}
+  .prod-d{font-size:${px(fn.affDesc,12)};font-weight:600;line-height:1.35}
+  .prod-p{
+    align-self:flex-start;font-family:'Anton',sans-serif;font-size:${px(fn.affPrice,14)};letter-spacing:.4px;
+    background:var(--ink);color:var(--yellow);padding:2px 8px;border-radius:6px;margin-top:2px;
+  }
+  .prod-cta{
+    flex:none;font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.5px;text-transform:uppercase;
+    background:var(--yellow);color:var(--ink);border:2px solid var(--ink);border-radius:10px;
+    padding:7px 11px;box-shadow:2px 2px 0 var(--ink);white-space:nowrap;
+  }
+
   /* ---------- Modal Popup Show More ---------- */
   .modal-backdrop{
     position:fixed;inset:0;z-index:100;
@@ -620,9 +721,10 @@ ${soc.map(s => `    <a class="btn" href="${e(safeUrl(s.url))}" target="_blank" r
   </header>
 ${linksSec}
 ${latest}
+${affiliateSec}
 ${social}
 ${d.footer ? `\n  <footer>${e(d.footer)}</footer>` : ''}
-</main>${modalHTML}${dataBlock}
+</main>${modalHTML}${affModalHTML}${modalScript}${dataBlock}
 </body>
 </html>
 `;
@@ -791,6 +893,11 @@ function tabProfile(){
       ${F('Konten: Coretan', 'fonts.latestScribble', {type:'range', min:11, max:28, def:15})}
       ${F('Kartu konten: Teks', 'fonts.postTitle', {type:'range', min:11, max:28, def:15})}
       ${F('Tombol Show More', 'fonts.moreBtn', {type:'range', min:14, max:32, def:20})}
+      ${F('Affiliate: Judul seksi', 'fonts.affHeading', {type:'range', min:16, max:42, def:26})}
+      ${F('Affiliate: Coretan', 'fonts.affScribble', {type:'range', min:11, max:28, def:15})}
+      ${F('Affiliate: Nama produk', 'fonts.affTitle', {type:'range', min:14, max:30, def:19})}
+      ${F('Affiliate: Deskripsi', 'fonts.affDesc', {type:'range', min:10, max:20, def:12})}
+      ${F('Affiliate: Harga', 'fonts.affPrice', {type:'range', min:11, max:24, def:14})}
       ${F('Footer', 'fonts.footer', {type:'range', min:10, max:22, def:13})}
     </div>
     <div class="add-row"><button class="b sm" data-act="resetFonts">↺ Reset semua ukuran font ke default</button></div>
@@ -839,6 +946,45 @@ function tabContent(){
       <button class="b" data-act="addContentHeading">+ Judul seksi</button>
       <button class="b" data-act="addContentText">+ Teks</button>
     </div>
+  </section>`;
+}
+
+/* ---------- Tab: Affiliate Produk ---------- */
+function affItem(x, i, n){
+  const base = `affiliate.items.${i}`, c = LINK_COLORS[x.color] || LINK_COLORS.white, img = imgSrc(x.image);
+  return `<details class="item${x.show ? '' : ' off'}" data-id="${x.id}"${OPEN.has(x.id) ? ' open' : ''}>
+    <summary><span class="num">${i + 1}</span><span class="sw" style="background:${c.bg || S.profile.accent} ${img ? `url('${esc(img.replace(/['"\\\n\r]/g,''))}') center/cover` : ''};color:${c.fg}">${img ? '' : sv(ICONS.cart, 18)}</span><span class="ttl"><b>${esc(x.title || '(tanpa nama produk)')}${x.price ? ` · ${esc(x.price)}` : ''}${!x.show ? '<span class="badge">hidden</span>' : ''}</b><i>${esc(x.url && x.url !== '#' ? x.url : '⚠ Link affiliate belum diisi')}</i></span>${acts('affiliate.items', i, n, x.show)}</summary>
+    <div class="body">
+      ${F('🔗 Link Affiliate (Shopee / Tokopedia / TikTok Shop / dll)', `${base}.url`, {type:'url', ph:'https://s.shopee.co.id/...', hint:'Tempel link affiliate produk lo di sini.'})}
+      <div class="grid2">${F('Nama produk', `${base}.title`, {ph:'Whey Protein Isolate'})}${F('Harga / diskon (opsional)', `${base}.price`, {ph:'Rp 299.000 / Diskon 30%'})}</div>
+      ${F('Deskripsi singkat (opsional)', `${base}.desc`, {ph:'Protein tinggi, rendah kalori & gampang larut'})}
+      <div class="grid2">${F('Label badge (opsional)', `${base}.badge`, {ph:'BEST SELLER / PROMO', max:16})}${F('Teks tombol beli', `${base}.cta`, {ph:'Beli', max:14})}</div>
+      <div class="grid2">${F('Ukuran font nama produk (khusus ini)', `${base}.fsTitle`, {type:'range', min:14, max:30, def:S.fonts.affTitle||19, reset:true})}${F('Ukuran font deskripsi (khusus ini)', `${base}.fsDesc`, {type:'range', min:10, max:20, def:S.fonts.affDesc||12, reset:true})}</div>
+      ${F('Ukuran font harga (khusus ini)', `${base}.fsPrice`, {type:'range', min:11, max:24, def:S.fonts.affPrice||14, reset:true})}
+      ${colorPicker(`${base}.color`, LINK_COLORS, 'Warna kartu produk')}
+      ${imgField('Foto produk (opsional)', `${base}.image`, 360, true)}
+      ${F('Buka di tab baru', `${base}.newTab`, {type:'check'})}
+    </div>
+  </details>`;
+}
+function tabAffiliate(){
+  const A = S.affiliate || DEFAULT.affiliate, items = A.items || [];
+  return `
+  <section class="card">
+    <h3>Affiliate produk <span class="scr">rekomendasi alat & suplemen</span></h3>
+    <p class="sub">Tampilin produk rekomendasi/affiliate lengkap sama foto, harga, badge & tombol beli. Di halaman depan otomatis tampil <b>3 teratas</b>, sisanya masuk pop-up.</p>
+    ${F('Tampilkan seksi affiliate produk', 'affiliate.show', {type:'check'})}
+    <div class="grid2">${F('Judul seksi', 'affiliate.heading', {ph:'Rekomendasi Produk'})}${F('Coretan', 'affiliate.scribble', {ph:'andalan gue!'})}</div>
+    <div class="grid2">${F('Ukuran font judul seksi', 'fonts.affHeading', {type:'range', min:16, max:42, def:26})}${F('Ukuran font coretan', 'fonts.affScribble', {type:'range', min:11, max:28, def:15})}</div>
+    ${F('Teks tombol lihat semua (muncul kalau produk > 3)', 'affiliate.moreText', {ph:'Lihat Semua Produk'})}
+  </section>
+  <section class="card">
+    <h3>Daftar produk affiliate <span class="scr">${items.length} produk</span></h3>
+    <p class="sub">Urutan <b>#1–#3</b> tampil di halaman utama. Urutan <b>#4 dst</b> muncul pas pengunjung klik tombol Lihat Semua Produk.</p>
+    <div class="grid2">${F('Ukuran font semua nama produk', 'fonts.affTitle', {type:'range', min:14, max:30, def:19})}${F('Ukuran font semua deskripsi', 'fonts.affDesc', {type:'range', min:10, max:20, def:12})}</div>
+    ${F('Ukuran font semua harga', 'fonts.affPrice', {type:'range', min:11, max:24, def:14})}
+    ${items.length ? items.map((x, i) => affItem(x, i, items.length)).join('') : '<div class="empty">Belum ada produk affiliate. Tambahin di bawah 👇</div>'}
+    <div class="add-row"><button class="b red" data-act="addAffiliate">+ Tambah produk affiliate</button></div>
   </section>`;
 }
 
@@ -927,6 +1073,7 @@ const TABS = [
   ['profile','Profil', tabProfile],
   ['links','Link', tabLinks, () => S.links.length],
   ['content','Konten', tabContent, () => S.latest.posts.length + (S.latest.links ? S.latest.links.length : 0)],
+  ['affiliate','Affiliate', tabAffiliate, () => (S.affiliate && S.affiliate.items ? S.affiliate.items.length : 0)],
   ['social','Sosmed', tabSocial, () => S.social.items.length],
   ['settings','Setelan', tabSettings]
 ];
@@ -983,6 +1130,7 @@ const ACTIONS = {
   addContentLink: () => addTo('latest.links', newLink('link'), true),
   addContentHeading: () => addTo('latest.links', newLink('heading')),
   addContentText: () => addTo('latest.links', newLink('text')),
+  addAffiliate: () => addTo('affiliate.items', {id:uid(), show:true, title:'Produk baru', desc:'', price:'', badge:'', cta:'Beli', url:'', color:'white', image:'', newTab:true}, true),
   addSocial: () => { const used = S.social.items.map(s => s.platform); const p = Object.keys(SOCIAL).find(k => !used.includes(k)) || 'website'; addTo('social.items', {id:uid(), show:true, platform:p, url:''}); },
   downloadHTML,
   copyHTML: async () => toast(await copyText(buildHTML(S, false)) ? '✓ HTML dicopy ke clipboard' : 'Gagal copy'),
@@ -991,7 +1139,7 @@ const ACTIONS = {
   togglePrev: () => document.body.classList.toggle('show-prev'),
   exportJSON: () => { download('lebihfit-backup-' + new Date().toISOString().slice(0,10) + '.json', JSON.stringify(S, null, 2), 'application/json'); toast('✓ Backup di-download'); },
   import: () => $('#importFile').click(),
-  resetFonts: () => { S.fonts = clone(DEFAULT.fonts); [...S.links, ...S.latest.posts, ...(S.latest.links||[])].forEach(x => { delete x.fsTitle; delete x.fsDesc; delete x.fs; }); commit(true); toast('✓ Ukuran font di-reset ke default'); },
+  resetFonts: () => { S.fonts = clone(DEFAULT.fonts); [...S.links, ...S.latest.posts, ...(S.latest.links||[]), ...((S.affiliate&&S.affiliate.items)||[])].forEach(x => { delete x.fsTitle; delete x.fsDesc; delete x.fsPrice; delete x.fs; }); commit(true); toast('✓ Ukuran font di-reset ke default'); },
   reset: () => { if(confirm('Reset semua data ke kondisi awal? Data sekarang bakal hilang.')){ S = normalize(clone(DEFAULT)); S.links.forEach(l => l.id = uid()); commit(true); toast('Data di-reset'); } }
 };
 function move(el, dir){
@@ -1018,10 +1166,10 @@ panel.addEventListener('input', e => {
   if(el.type === 'range'){ const vb = el.parentElement.querySelector('[data-val]'); if(vb) vb.textContent = el.value + 'px'; }
   // update judul item tanpa re-render (biar fokus input nggak hilang)
   const item = el.closest('.item');
-  if(item && /\.(title|text|hl)$/.test(p)){
+  if(item && /\.(title|text|hl|price)$/.test(p)){
     const b = item.querySelector('.ttl b');
     const parts = p.split('.'), obj = get(parts.slice(0, -1).join('.'));
-    if(b) b.firstChild.textContent = (obj.text !== undefined ? (obj.text + ' ' + (obj.hl || '')).trim() : obj.title) || '(tanpa judul)';
+    if(b) b.firstChild.textContent = (obj.text !== undefined ? (obj.text + ' ' + (obj.hl || '')).trim() : (obj.title || '(tanpa judul)') + (obj.price ? ' · ' + obj.price : '')) || '(tanpa judul)';
   }
   if(item && /\.url$/.test(p)){
     const sub = item.querySelector('.ttl i');
