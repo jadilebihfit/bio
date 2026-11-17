@@ -1106,7 +1106,6 @@ function tabSettings(){
     <div class="grid2">${G('Username / org', 'owner', {ph:'jadilebihfit'})}${G('Nama repo', 'repo', {ph:'bio'})}</div>
     <div class="grid2">${G('Branch', 'branch', {ph:'main'})}${G('File tujuan', 'path', {ph:'index.html'})}</div>
     ${G('GitHub token', 'token', {type:'password', ph:'github_pat_...', hint:'Token cuma disimpen di browser ini & <b>nggak</b> ikut ke file HTML. Jangan isi di komputer orang lain.'})}
-    <label class="chk"><input type="checkbox" data-gh-chk="auto"${GH.auto ? ' checked' : ''}><span>Auto-Publish (otomatis push ke GitHub 3 detik setelah selesai ngetik)</span></label>
     <div class="add-row">
       <button class="b teal" data-act="ghTest">Test koneksi</button>
       <button class="b" data-act="pull">⬇ Ambil data live</button>
@@ -1335,15 +1334,15 @@ document.addEventListener('keydown', e => {
    ========================================================= */
 const GH_KEY = 'lebihfit-gh-v1', PUB_KEY = 'lebihfit-published-v1';
 /* Token TIDAK disimpan di file ini (repo publik → GitHub otomatis mencabut token yang bocor). Isi lewat Setelan, tersimpan di browser aja. */
-let GH = Object.assign({owner:'jadilebihfit', repo:'bio', branch:'main', path:'index.html', token:'', auto:true}, (() => { try{ const x = JSON.parse(localStorage.getItem(GH_KEY) || '{}'); if(x.auto === undefined) x.auto = true; return x; }catch(e){ return {}; } })());
+let GH = Object.assign({owner:'jadilebihfit', repo:'bio', branch:'main', path:'index.html', token:'', auto:false}, (() => { try{ const x = JSON.parse(localStorage.getItem(GH_KEY) || '{}'); x.auto = false; return x; }catch(e){ return {}; } })());
 let publishing = false, buildTimer, autoPubTimer, pubAgain = false;
 function saveGH(){ try{ localStorage.setItem(GH_KEY, JSON.stringify(GH)); }catch(e){} }
+/* Publish MANUAL: perubahan cuma disimpan lokal, naik ke GitHub hanya pas tombol 🚀 Publish diklik. */
 function scheduleAutoPub(){
   clearTimeout(autoPubTimer);
-  if(!GH.auto || !GH.token || !isDirty()) return;
-  setStatus('⏳ Auto-publish dalam 3 dtk…');
-  autoPubTimer = setTimeout(() => { if(isDirty()) publish(true); }, 3000);
+  if(!publishing && isDirty()) setStatus('● Ada perubahan belum live — klik 🚀 Publish');
 }
+window.addEventListener('beforeunload', e => { if(isDirty() && GH.token){ e.preventDefault(); e.returnValue = ''; } });
 const encPath = p => String(p || 'index.html').replace(/^\/+/, '').split('/').map(encodeURIComponent).join('/');
 
 function gh(path, opt = {}){
@@ -1403,7 +1402,7 @@ async function publish(){
       setStatus('🚀 Ke-publish · nunggu GitHub Pages deploy…');
       toast('🚀 Ke-publish! Web update ±1–2 menit lagi');
       watchBuild(j.commit && j.commit.sha);
-      if(pubAgain || isDirty()) scheduleAutoPub();     // ada edit baru selama publish → kirim lagi
+      if(pubAgain){ pubAgain = false; publish(); }     // tombol Publish diklik lagi pas lagi proses → jalan lagi
       return;
     }catch(err){
       lastErr = err;
