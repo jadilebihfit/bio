@@ -233,15 +233,16 @@ const DEFAULT = {
     {id:uid(),show:true,text:'Otot lo harus',hl:'dirobek?!',url:'#',style:'p3',image:''}
   ],links:[]},
   affiliate:{show:true,heading:'Rekomendasi Produk',scribble:'andalan gue!',moreText:'Lihat Semua Produk',items:[
-    {id:uid(),show:true,title:'Whey Protein Isolate',desc:'Protein tinggi, rendah kalori & gampang larut',price:'Rp 299.000',badge:'BEST SELLER',cta:'Beli',url:'#',color:'white',image:'',newTab:true}
+    {id:uid(),show:true,title:'Whey Protein Isolate',store:'Shopee',desc:'Protein tinggi, rendah kalori & gampang larut',price:'Rp 299.000',badge:'BEST SELLER',cta:'Beli sekarang',url:'#',color:'white',image:'',newTab:true}
   ]},
   social:{show:true,items:[
     {id:uid(),show:true,platform:'instagram',url:'https://www.instagram.com/lebihfit/'},
     {id:uid(),show:true,platform:'tiktok',url:'#'},
     {id:uid(),show:true,platform:'youtube',url:'#'}
   ]},
-  digital:{show:true,heading:'Produk Gue',scribble:'pilih yang lo butuh',tabDigital:'Produk Digital',tabAff:'Affiliate',defaultTab:'digital',items:[{id:uid(),type:'link',show:true,title:'Ebook Program Gym',desc:'Panduan latihan lengkap buat pemula',url:'#',color:'yellow',icon:'download',arrow:'chevron',newTab:false,badge:'NEW'}]},
-  fonts:{segBtn:18,name:56,tagline:20,bio:16,featSticker:15,featKicker:13,featTitle:34,featUrl:14,linkTitle:22,linkDesc:13,secHeading:24,noteText:15,latestHeading:26,latestScribble:15,postTitle:15,moreBtn:20,affHeading:26,affScribble:15,affTitle:19,affDesc:12,affPrice:14,footer:13},
+  tabs:{show:true,linkLabel:'Link',prodLabel:'Produk',defaultTab:'link',showCount:true,countText:'produk',disclaimer:'Beberapa link di bawah adalah link afiliasi. Kalau kamu beli lewat link ini, aku dapat komisi kecil tanpa biaya tambahan untukmu.'},
+  digital:{show:true,heading:'Produk Digital Gue',scribble:'langsung gas!',items:[{id:uid(),type:'link',show:true,title:'Ebook Program Gym',desc:'Panduan latihan lengkap buat pemula',url:'#',color:'yellow',icon:'download',arrow:'chevron',newTab:false,badge:'NEW'}]},
+  fonts:{segBtn:18,name:56,tagline:20,bio:16,featSticker:15,featKicker:13,featTitle:34,featUrl:14,linkTitle:22,linkDesc:13,secHeading:24,noteText:15,latestHeading:26,latestScribble:15,postTitle:15,moreBtn:20,affHeading:26,affScribble:15,affTitle:16,affDesc:12,affPrice:14,footer:13},
   footer:'@lebihfit · Latihan bener, hasil kelihatan'
 };
 
@@ -257,6 +258,7 @@ function normalize(d){
   out.latest = Object.assign(clone(DEFAULT.latest), (d||{}).latest || {});
   out.affiliate = Object.assign(clone(DEFAULT.affiliate), (d||{}).affiliate || {});
   out.digital = Object.assign(clone(DEFAULT.digital), (d||{}).digital || {});
+  out.tabs = Object.assign(clone(DEFAULT.tabs), (d||{}).tabs || {});
   if(!Array.isArray(out.digital.items)) out.digital.items = [];
   out.social = Object.assign(clone(DEFAULT.social), (d||{}).social || {});
   ['links'].forEach(k => { if(!Array.isArray(out[k])) out[k] = clone(DEFAULT[k]); });
@@ -415,79 +417,71 @@ ${allCLinks}
 </div>`;
 
   const aff = d.affiliate || DEFAULT.affiliate;
+  const tb = Object.assign({}, DEFAULT.tabs, d.tabs || {});
   const affItems = (aff.items || []).filter(x => x.show);
   const renderAff = x => {
     const img = imgSrc(x.image);
     const fsT = x.fsTitle > 0 ? `font-size:${+x.fsTitle}px` : '';
     const fsD = x.fsDesc > 0 ? `font-size:${+x.fsDesc}px` : '';
     const fsP = x.fsPrice > 0 ? `font-size:${+x.fsPrice}px` : '';
-    return `      <a class="btn prod ${e(x.color || 'white')}" href="${e(safeUrl(x.url))}"${tgt(x.newTab !== false)}>
-        <span class="prod-img">${img ? `<img src="${e(img)}" alt="${e(x.title)}">` : sv(ICONS.cart, 26)}</span>
-        <span class="prod-txt">
-          <span class="prod-top">
-            <span class="prod-t"${st(fsT)}>${e(x.title)}${x.badge ? ` <span class="badge">${e(x.badge)}</span>` : ''}</span>
-          </span>
-          ${x.desc ? `<span class="prod-d"${st(fsD)}>${e(x.desc)}</span>` : ''}
-          ${x.price ? `<span class="prod-p"${st(fsP)}>${e(x.price)}</span>` : ''}
+    return `      <a class="btn pcard ${e(x.color || 'white')}" href="${e(safeUrl(x.url))}"${tgt(x.newTab !== false)}>
+        <span class="pc-img">${img ? `<img src="${e(img)}" alt="${e(x.title)}" loading="lazy">` : sv(ICONS.cart, 44, 2)}</span>
+        <span class="pc-body">
+          ${x.store ? `<span class="pc-store">${e(x.store)}</span>` : ''}
+          <span class="pc-t"${st(fsT)}>${e(x.title)}${x.badge ? ` <span class="badge">${e(x.badge)}</span>` : ''}</span>
+          ${x.desc ? `<span class="pc-d"${st(fsD)}>${e(x.desc)}</span>` : ''}
+          ${x.price ? `<span class="pc-p"${st(fsP)}>${e(x.price)}</span>` : ''}
+          <span class="pc-cta">${e(x.cta || 'Beli sekarang')} ${sv(ARROWS.diag, 14, 2.8)}</span>
         </span>
-        <span class="prod-cta">${e(x.cta || 'Beli')} ↗</span>
       </a>`;
   };
-  const topAff = affItems.slice(0, 3);
-  const hasMoreAff = affItems.length > 3;
-  const affMoreCount = Math.max(0, affItems.length - 3);
-  const affMoreLabel = aff.moreText || 'Lihat Semua Produk';
 
-  const affBody = `
-    <div class="prod-list">
-${topAff.map(renderAff).join('\n')}
-    </div>${hasMoreAff ? `
-    <button type="button" class="btn more-btn" data-open-modal="affModal">
-      <span>${e(affMoreLabel)}</span>
-      <span class="more-cnt">+${affMoreCount}</span>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.5L21 8H6"/></svg>
-    </button>` : ''}`;
-
-  const affiliateSec = (!aff.show || !affItems.length) ? '' : `
-  <section class="latest aff-sec" aria-label="Affiliate Produk">
-    <div class="latest-head">
-      <h2>${e(aff.heading || 'Rekomendasi Produk')}</h2>
-      ${aff.scribble ? `<span class="scribble">${e(aff.scribble)}</span>` : ''}
-    </div>${affBody}
+  const showAff = !!(aff.show && affItems.length);
+  const showTabs = !!(tb.show && showAff);
+  const affSec = !showAff ? '' : `
+  <section class="latest aff-sec" aria-label="Produk affiliate">
+    <div class="aff-head">
+      <div class="l">
+        <h2>${e(aff.heading || 'Rekomendasi Produk')}</h2>
+        ${aff.scribble ? `<span class="scribble">${e(aff.scribble)}</span>` : ''}
+      </div>
+      ${tb.showCount ? `<span class="aff-count">${affItems.length} ${e(tb.countText || 'produk')}</span>` : ''}
+    </div>
+    <div class="pgrid">
+${affItems.map(renderAff).join('\n')}
+    </div>${tb.disclaimer ? `
+    <p class="aff-disc">${e(tb.disclaimer)}</p>` : ''}
   </section>`;
 
-  /* ---- Menu tombol: Produk Digital <-> Affiliate ---- */
+  /* ---- Produk digital (link) ---- */
   const dg = d.digital || DEFAULT.digital;
   const digVis = (dg.items || []).filter(l => l.show);
-  const showDig = !!(dg.show && digVis.length), showAff = !!(aff.show && affItems.length);
-  const digList = digVis.map(renderLinkItem).join('\n');
-  const dgHead = `
+  const digSec = (dg.show && digVis.length) ? `
+  <section class="latest prod-sec" aria-label="Produk Digital">
     <div class="latest-head">
-      <h2>${e(dg.heading || 'Produk Gue')}</h2>
+      <h2>${e(dg.heading || 'Produk Digital')}</h2>
       ${dg.scribble ? `<span class="scribble">${e(dg.scribble)}</span>` : ''}
-    </div>`;
-  const startAff = dg.defaultTab === 'aff';
-  const productsSec = (showDig && showAff) ? `
-  <section class="latest prod-sec aff-sec" aria-label="Produk">${dgHead}
-    <div class="seg" role="tablist">
-      <button type="button" class="btn seg-btn${startAff ? '' : ' on'}" role="tab" data-seg="digital">${sv(ICONS.download, 18, 2.6)}<span>${e(dg.tabDigital || 'Produk Digital')}</span></button>
-      <button type="button" class="btn seg-btn${startAff ? ' on' : ''}" role="tab" data-seg="aff">${sv(ICONS.cart, 18, 2.6)}<span>${e(dg.tabAff || 'Affiliate')}</span></button>
     </div>
-    <div class="seg-panel" data-panel="digital"${startAff ? ' hidden' : ''}>
-      <div class="links">
-${digList}
-      </div>
-    </div>
-    <div class="seg-panel" data-panel="aff"${startAff ? '' : ' hidden'}>${affBody}
-    </div>
-  </section>` : showDig ? `
-  <section class="latest prod-sec" aria-label="Produk Digital">${dgHead}
     <div class="links">
-${digList}
+${digVis.map(renderLinkItem).join('\n')}
     </div>
-  </section>` : affiliateSec;
+  </section>` : '';
 
-  const segScript = (showDig && showAff) ? `
+  /* ---- Menu tab: Link | Produk ---- */
+  const startProd = tb.defaultTab === 'prod';
+  const tabsBar = !showTabs ? '' : `
+  <div class="seg" role="tablist" aria-label="Menu">
+    <button type="button" class="btn seg-btn${startProd ? '' : ' on'}" role="tab" data-seg="link">${e(tb.linkLabel || 'Link')}</button>
+    <button type="button" class="btn seg-btn${startProd ? ' on' : ''}" role="tab" data-seg="prod">${e(tb.prodLabel || 'Produk')}${tb.showCount ? ` <span class="cnt">${affItems.length}</span>` : ''}</button>
+  </div>`;
+  const linkPanel = `${linksSec}${digSec}${latest}`;
+  const bodyMain = showTabs ? `${tabsBar}
+  <div class="tab-panel" data-panel="link"${startProd ? ' hidden' : ''}>${linkPanel}
+  </div>
+  <div class="tab-panel" data-panel="prod"${startProd ? '' : ' hidden'}>${affSec}
+  </div>` : `${linkPanel}${affSec}`;
+
+  const segScript = showTabs ? `
 <script>
 (function(){
   var btns = document.querySelectorAll('[data-seg]'), panels = document.querySelectorAll('[data-panel]');
@@ -495,29 +489,12 @@ ${digList}
     var k = b.getAttribute('data-seg');
     btns.forEach(function(x){ x.classList.toggle('on', x === b); x.setAttribute('aria-selected', x === b ? 'true' : 'false'); });
     panels.forEach(function(p){ p.hidden = p.getAttribute('data-panel') !== k; });
+    try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){}
   }); });
 })();
 <\/script>` : '';
 
-  const affModalHTML = (!aff.show || !hasMoreAff) ? '' : `
-<div class="modal-backdrop" id="affModal" aria-hidden="true">
-  <div class="modal-box" role="dialog" aria-modal="true" aria-label="${e(aff.heading || 'Semua Produk')}">
-    <div class="modal-head">
-      <div>
-        <h2>${e(aff.heading || 'Semua Produk')}</h2>
-        ${aff.scribble ? `<span class="scribble">${e(aff.scribble)}</span>` : ''}
-      </div>
-      <button type="button" class="btn modal-close" data-close-modal aria-label="Tutup">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="prod-list">
-${affItems.map(renderAff).join('\n')}
-      </div>
-    </div>
-  </div>
-</div>`;
-
-  const modalScript = (modalHTML || affModalHTML) ? `
+  const modalScript = modalHTML ? `
 <script>
 (function(){
   function open(id){ var m = document.getElementById(id); if(!m) return; m.classList.add('open'); m.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
@@ -678,49 +655,67 @@ ${soc.map(s => `    <a class="btn" href="${e(safeUrl(s.url))}" target="_blank" r
     background:var(--ink);color:var(--yellow);padding:2px 8px;border-radius:999px;
   }
 
-  /* ---------- Affiliate Produk ---------- */
+  /* ---------- Tab Link | Produk ---------- */
+  .seg{
+    display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:6px;
+    background:var(--ink);border:3px solid var(--ink);border-radius:999px;box-shadow:var(--shadow);
+  }
+  .seg-btn{
+    display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 10px;
+    border:0;border-radius:999px;background:transparent;color:#CFC6AE;cursor:pointer;
+    font-family:'Anton',sans-serif;font-size:${px(fn.segBtn,18)};letter-spacing:.5px;text-transform:uppercase;
+    transition:background .15s ease,color .15s ease;
+  }
+  .seg-btn:hover{transform:none;box-shadow:none!important}
+  .seg-btn.on{background:var(--yellow);color:var(--ink)}
+  .seg-btn .cnt{font-family:'Archivo',sans-serif;font-size:.7em;font-weight:800;opacity:.75}
+  .tab-panel[hidden]{display:none}
+  .tab-panel{display:flex;flex-direction:column;gap:28px}
+
+  /* ---------- Produk affiliate (kartu) ---------- */
+  .aff-sec{gap:16px}
   .aff-sec h2{font-size:${px(fn.affHeading,26)}}
   .aff-sec .scribble{font-size:${px(fn.affScribble,15)}}
-  .prod-list{display:flex;flex-direction:column;gap:12px}
-  .aff-sec{gap:16px}
-  .seg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .seg-btn{
-    display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 10px;
-    border:3px solid var(--ink);border-radius:14px;background:#fff;color:var(--ink);box-shadow:3px 3px 0 var(--ink);
-    font-family:'Anton',sans-serif;font-size:${px(fn.segBtn,18)};letter-spacing:.4px;text-transform:uppercase;cursor:pointer;
-  }
-  .seg-btn.on{background:var(--ink);color:var(--yellow)}
-  .seg-panel[hidden]{display:none}
-  .seg-panel{display:flex;flex-direction:column;gap:14px}
-  .prod{
-    display:flex;align-items:center;gap:12px;padding:12px;
+  .aff-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .aff-head .l{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .aff-count{font-size:14px;font-weight:800;color:#4A443B}
+  .pgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .pcard{
+    display:flex;flex-direction:column;overflow:hidden;
     border:3px solid var(--ink);border-radius:16px;box-shadow:var(--shadow);
   }
-  .prod.white{background:#fff;color:var(--ink)}.prod.white .prod-d{color:#4A443B}
-  .prod.cream{background:#F9E7B8;color:var(--ink)}.prod.cream .prod-d{color:#4A443B}
-  .prod.yellow{background:var(--yellow);color:var(--ink)}.prod.yellow .prod-d{color:#4A443B}.prod.yellow .prod-cta{background:#fff;color:var(--ink)}
-  .prod.teal{background:var(--teal);color:#fff}.prod.teal .prod-d{color:#CDE7E2}.prod.teal .prod-p{background:var(--yellow);color:var(--ink)}
-  .prod.navy{background:var(--navy);color:#fff}.prod.navy .prod-d{color:#D6D3F5}.prod.navy .prod-p{background:var(--yellow);color:var(--ink)}
-  .prod.red{background:var(--red);color:#fff}.prod.red .prod-d{color:#FFE3DC}.prod.red .prod-p{background:var(--yellow);color:var(--ink)}
-  .prod.ink{background:var(--ink);color:var(--cream)}.prod.ink .prod-d{color:#CFC6AE}.prod.ink .prod-p{background:var(--yellow);color:var(--ink)}
-  .prod.accent{background:var(--accent);color:#fff}.prod.accent .prod-d{color:rgba(255,255,255,.85)}.prod.accent .prod-p{background:var(--yellow);color:var(--ink)}
-  .prod-img{
-    width:62px;height:62px;flex:none;border-radius:12px;border:2px solid var(--ink);
-    background:var(--yellow);color:var(--ink);display:flex;align-items:center;justify-content:center;overflow:hidden;
+  .pcard.white{background:#fff;color:var(--ink)}.pcard.white .pc-d{color:#4A443B}
+  .pcard.cream{background:#F9E7B8;color:var(--ink)}.pcard.cream .pc-d{color:#4A443B}
+  .pcard.yellow{background:var(--yellow);color:var(--ink)}.pcard.yellow .pc-d{color:#4A443B}
+  .pcard.teal{background:var(--teal);color:#fff}.pcard.teal .pc-d{color:#CDE7E2}
+  .pcard.navy{background:var(--navy);color:#fff}.pcard.navy .pc-d{color:#D6D3F5}
+  .pcard.red{background:var(--red);color:#fff}.pcard.red .pc-d{color:#FFE3DC}
+  .pcard.ink{background:var(--ink);color:var(--cream)}.pcard.ink .pc-d{color:#CFC6AE}
+  .pcard.accent{background:var(--accent);color:#fff}.pcard.accent .pc-d{color:rgba(255,255,255,.85)}
+  .pc-img{
+    aspect-ratio:1/1;border-bottom:3px solid var(--ink);background:var(--yellow);color:var(--ink);
+    background-image:repeating-conic-gradient(#F5B82E 0deg 12deg,#F9CB55 12deg 24deg);
+    display:flex;align-items:center;justify-content:center;overflow:hidden;
   }
-  .prod-img img{width:100%;height:100%;object-fit:cover;display:block}
-  .prod-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
-  .prod-t{font-family:'Anton',sans-serif;font-size:${px(fn.affTitle,19)};line-height:1.1;text-transform:uppercase;letter-spacing:.3px}
-  .prod-d{font-size:${px(fn.affDesc,12)};font-weight:600;line-height:1.35}
-  .prod-p{
+  .pc-img img{width:100%;height:100%;object-fit:cover;display:block}
+  .pc-body{flex:1;display:flex;flex-direction:column;gap:5px;padding:12px}
+  .pc-store{font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;opacity:.75}
+  .pc-t{font-family:'Anton',sans-serif;font-size:${px(fn.affTitle,16)};line-height:1.1;text-transform:uppercase;letter-spacing:.3px}
+  .pc-d{font-size:${px(fn.affDesc,12)};font-weight:600;line-height:1.35}
+  .pc-p{
     align-self:flex-start;font-family:'Anton',sans-serif;font-size:${px(fn.affPrice,14)};letter-spacing:.4px;
-    background:var(--ink);color:var(--yellow);padding:2px 8px;border-radius:6px;margin-top:2px;
+    background:var(--ink);color:var(--yellow);padding:2px 8px;border-radius:6px;
   }
-  .prod-cta{
-    flex:none;font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.5px;text-transform:uppercase;
-    background:var(--yellow);color:var(--ink);border:2px solid var(--ink);border-radius:10px;
-    padding:7px 11px;box-shadow:2px 2px 0 var(--ink);white-space:nowrap;
+  .pcard.ink .pc-p,.pcard.navy .pc-p,.pcard.teal .pc-p,.pcard.red .pc-p,.pcard.accent .pc-p{background:var(--yellow);color:var(--ink)}
+  .pc-cta{
+    margin-top:auto;display:flex;align-items:center;justify-content:center;gap:6px;
+    font-family:'Anton',sans-serif;font-size:14px;letter-spacing:.5px;text-transform:uppercase;
+    background:var(--yellow);color:var(--ink);border:2px solid var(--ink);border-radius:999px;
+    padding:8px 10px;box-shadow:2px 2px 0 var(--ink);white-space:nowrap;
   }
+  .pcard.yellow .pc-cta{background:#fff}
+  .pc-body .pc-cta{margin-top:8px}
+  .aff-disc{margin:0;font-size:13px;font-weight:600;line-height:1.5;color:#4A443B}
 
   /* ---------- Modal Popup Show More ---------- */
   .modal-backdrop{
@@ -777,12 +772,10 @@ ${soc.map(s => `    <a class="btn" href="${e(safeUrl(s.url))}" target="_blank" r
     </div>
     ${p.bio ? `<p class="bio">${e(p.bio)}</p>` : ''}
   </header>
-${linksSec}
-${latest}
-${productsSec}
+${bodyMain}
 ${social}
 ${d.footer ? `\n  <footer>${e(d.footer)}</footer>` : ''}
-</main>${modalHTML}${affModalHTML}${modalScript}${segScript}${dataBlock}
+</main>${modalHTML}${modalScript}${segScript}${dataBlock}
 </body>
 </html>
 `;
@@ -953,7 +946,7 @@ function tabProfile(){
       ${F('Tombol Show More', 'fonts.moreBtn', {type:'range', min:14, max:32, def:20})}
       ${F('Affiliate: Judul seksi', 'fonts.affHeading', {type:'range', min:16, max:42, def:26})}
       ${F('Affiliate: Coretan', 'fonts.affScribble', {type:'range', min:11, max:28, def:15})}
-      ${F('Affiliate: Nama produk', 'fonts.affTitle', {type:'range', min:14, max:30, def:19})}
+      ${F('Affiliate: Nama produk', 'fonts.affTitle', {type:'range', min:12, max:28, def:16})}
       ${F('Affiliate: Deskripsi', 'fonts.affDesc', {type:'range', min:10, max:20, def:12})}
       ${F('Affiliate: Harga', 'fonts.affPrice', {type:'range', min:11, max:24, def:14})}
       ${F('Footer', 'fonts.footer', {type:'range', min:10, max:22, def:13})}
@@ -1012,12 +1005,10 @@ function tabDigital(){
   const D = S.digital || DEFAULT.digital, items = D.items || [];
   return `
   <section class="card">
-    <h3>Menu tombol Produk <span class="scr">Digital ⇄ Affiliate</span></h3>
-    <p class="sub">Kalau <b>Produk Digital</b> & <b>Affiliate</b> sama-sama punya isi, di halaman utama muncul <b>2 tombol pilihan</b> (tab). Pengunjung klik tombolnya buat ganti isi di bawahnya.</p>
-    ${F('Tampilkan seksi Produk Digital / menu tombol', 'digital.show', {type:'check'})}
-    <div class="grid2">${F('Judul seksi', 'digital.heading', {ph:'Produk Gue'})}${F('Coretan', 'digital.scribble', {ph:'pilih yang lo butuh'})}</div>
-    <div class="grid2">${F('Teks tombol 1', 'digital.tabDigital', {ph:'Produk Digital', max:22})}${F('Teks tombol 2', 'digital.tabAff', {ph:'Affiliate', max:22})}</div>
-    <div class="grid2">${F('Tab yang kebuka duluan', 'digital.defaultTab', {type:'select', options:[['digital','Produk Digital'],['aff','Affiliate']]})}${F('Ukuran font tombol', 'fonts.segBtn', {type:'range', min:12, max:28, def:18})}</div>
+    <h3>Produk digital <span class="scr">masuk tab Link</span></h3>
+    <p class="sub">Ebook, program latihan, template, kelas online, dll. Muncul di tab <b>Link</b> (di bawah link utama). Produk affiliate ada di tab admin <b>Affiliate</b> → muncul di tab <b>Produk</b>.</p>
+    ${F('Tampilkan seksi produk digital', 'digital.show', {type:'check'})}
+    <div class="grid2">${F('Judul seksi', 'digital.heading', {ph:'Produk Digital Gue'})}${F('Coretan', 'digital.scribble', {ph:'langsung gas!'})}</div>
   </section>
   <section class="card">
     <h3>Link produk digital gue <span class="scr">${items.length} item</span></h3>
@@ -1040,8 +1031,9 @@ function affItem(x, i, n){
       ${F('🔗 Link Affiliate (Shopee / Tokopedia / TikTok Shop / dll)', `${base}.url`, {type:'url', ph:'https://s.shopee.co.id/...', hint:'Tempel link affiliate produk lo di sini.'})}
       <div class="grid2">${F('Nama produk', `${base}.title`, {ph:'Whey Protein Isolate'})}${F('Harga / diskon (opsional)', `${base}.price`, {ph:'Rp 299.000 / Diskon 30%'})}</div>
       ${F('Deskripsi singkat (opsional)', `${base}.desc`, {ph:'Protein tinggi, rendah kalori & gampang larut'})}
-      <div class="grid2">${F('Label badge (opsional)', `${base}.badge`, {ph:'BEST SELLER / PROMO', max:16})}${F('Teks tombol beli', `${base}.cta`, {ph:'Beli', max:14})}</div>
-      <div class="grid2">${F('Ukuran font nama produk (khusus ini)', `${base}.fsTitle`, {type:'range', min:14, max:30, def:S.fonts.affTitle||19, reset:true})}${F('Ukuran font deskripsi (khusus ini)', `${base}.fsDesc`, {type:'range', min:10, max:20, def:S.fonts.affDesc||12, reset:true})}</div>
+      <div class="grid2">${F('Nama toko / marketplace', `${base}.store`, {ph:'Shopee / Tokopedia / TikTok Shop', max:24})}${F('Label badge (opsional)', `${base}.badge`, {ph:'BEST SELLER / PROMO', max:16})}</div>
+      ${F('Teks tombol beli', `${base}.cta`, {ph:'Beli sekarang', max:20})}
+      <div class="grid2">${F('Ukuran font nama produk (khusus ini)', `${base}.fsTitle`, {type:'range', min:14, max:30, def:S.fonts.affTitle||16, reset:true})}${F('Ukuran font deskripsi (khusus ini)', `${base}.fsDesc`, {type:'range', min:10, max:20, def:S.fonts.affDesc||12, reset:true})}</div>
       ${F('Ukuran font harga (khusus ini)', `${base}.fsPrice`, {type:'range', min:11, max:24, def:S.fonts.affPrice||14, reset:true})}
       ${colorPicker(`${base}.color`, LINK_COLORS, 'Warna kartu produk')}
       ${imgField('Foto produk (opsional)', `${base}.image`, 360, true)}
@@ -1053,17 +1045,26 @@ function tabAffiliate(){
   const A = S.affiliate || DEFAULT.affiliate, items = A.items || [];
   return `
   <section class="card">
-    <h3>Affiliate produk <span class="scr">rekomendasi alat & suplemen</span></h3>
-    <p class="sub">Tampilin produk rekomendasi/affiliate lengkap sama foto, harga, badge & tombol beli. Di halaman depan otomatis tampil <b>3 teratas</b>, sisanya masuk pop-up.</p>
+    <h3>Menu tab <span class="scr">Link | Produk</span></h3>
+    <p class="sub">Halaman bio dibagi 2 tab di atas: <b>Link</b> (link utama, produk digital, konten) dan <b>Produk</b> (kartu affiliate). Tab otomatis muncul kalau ada produk affiliate.</p>
+    ${F('Pakai menu tab Link | Produk', 'tabs.show', {type:'check'})}
+    <div class="grid2">${F('Teks tab 1', 'tabs.linkLabel', {ph:'Link', max:18})}${F('Teks tab 2', 'tabs.prodLabel', {ph:'Produk', max:18})}</div>
+    <div class="grid2">${F('Tab yang kebuka duluan', 'tabs.defaultTab', {type:'select', options:[['link','Link'],['prod','Produk']]})}${F('Ukuran font tab', 'fonts.segBtn', {type:'range', min:12, max:28, def:18})}</div>
+    ${F('Tampilkan jumlah produk (mis. "1 produk")', 'tabs.showCount', {type:'check'})}
+    ${F('Teks setelah angka jumlah', 'tabs.countText', {ph:'produk', max:12})}
+    ${F('Disclaimer affiliate (di bawah kartu produk)', 'tabs.disclaimer', {type:'textarea', rows:3})}
+  </section>
+  <section class="card">
+    <h3>Affiliate produk <span class="scr">kartu rekomendasi</span></h3>
+    <p class="sub">Tampil sebagai kartu 2 kolom: foto, nama toko, nama produk, harga & tombol beli.</p>
     ${F('Tampilkan seksi affiliate produk', 'affiliate.show', {type:'check'})}
     <div class="grid2">${F('Judul seksi', 'affiliate.heading', {ph:'Rekomendasi Produk'})}${F('Coretan', 'affiliate.scribble', {ph:'andalan gue!'})}</div>
     <div class="grid2">${F('Ukuran font judul seksi', 'fonts.affHeading', {type:'range', min:16, max:42, def:26})}${F('Ukuran font coretan', 'fonts.affScribble', {type:'range', min:11, max:28, def:15})}</div>
-    ${F('Teks tombol lihat semua (muncul kalau produk > 3)', 'affiliate.moreText', {ph:'Lihat Semua Produk'})}
   </section>
   <section class="card">
     <h3>Daftar produk affiliate <span class="scr">${items.length} produk</span></h3>
-    <p class="sub">Urutan <b>#1–#3</b> tampil di halaman utama. Urutan <b>#4 dst</b> muncul pas pengunjung klik tombol Lihat Semua Produk.</p>
-    <div class="grid2">${F('Ukuran font semua nama produk', 'fonts.affTitle', {type:'range', min:14, max:30, def:19})}${F('Ukuran font semua deskripsi', 'fonts.affDesc', {type:'range', min:10, max:20, def:12})}</div>
+    <p class="sub">Semua produk tampil di tab <b>Produk</b>, urut dari atas ke bawah (kiri ke kanan).</p>
+    <div class="grid2">${F('Ukuran font semua nama produk', 'fonts.affTitle', {type:'range', min:12, max:28, def:16})}${F('Ukuran font semua deskripsi', 'fonts.affDesc', {type:'range', min:10, max:20, def:12})}</div>
     ${F('Ukuran font semua harga', 'fonts.affPrice', {type:'range', min:11, max:24, def:14})}
     ${items.length ? items.map((x, i) => affItem(x, i, items.length)).join('') : '<div class="empty">Belum ada produk affiliate. Tambahin di bawah 👇</div>'}
     <div class="add-row"><button class="b red" data-act="addAffiliate">+ Tambah produk affiliate</button></div>
@@ -1216,7 +1217,7 @@ const ACTIONS = {
   addDigitalLink: () => addTo('digital.items', Object.assign(newLink('link'), {color:'yellow', icon:'download'})),
   addDigitalHeading: () => addTo('digital.items', newLink('heading')),
   addDigitalText: () => addTo('digital.items', newLink('text')),
-  addAffiliate: () => addTo('affiliate.items', {id:uid(), show:true, title:'Produk baru', desc:'', price:'', badge:'', cta:'Beli', url:'', color:'white', image:'', newTab:true}, true),
+  addAffiliate: () => addTo('affiliate.items', {id:uid(), show:true, title:'Produk baru', store:'Shopee', desc:'', price:'', badge:'', cta:'Beli sekarang', url:'', color:'white', image:'', newTab:true}, true),
   addSocial: () => { const used = S.social.items.map(s => s.platform); const p = Object.keys(SOCIAL).find(k => !used.includes(k)) || 'website'; addTo('social.items', {id:uid(), show:true, platform:p, url:''}); },
   downloadHTML,
   copyHTML: async () => toast(await copyText(buildHTML(S, false)) ? '✓ HTML dicopy ke clipboard' : 'Gagal copy'),
