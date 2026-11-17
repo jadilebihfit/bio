@@ -146,7 +146,7 @@
       <button class="b sm" data-act="refresh">↻</button>
       <button class="b sm prev-close" data-act="togglePrev">✕ Tutup</button>
     </div>
-    <div class="phone"><iframe id="frame" title="Preview" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe></div>
+    <div class="phone"><iframe id="frame" title="Preview" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe></div>
   </aside>
 </div>
 
@@ -240,7 +240,8 @@ const DEFAULT = {
     {id:uid(),show:true,platform:'tiktok',url:'#'},
     {id:uid(),show:true,platform:'youtube',url:'#'}
   ]},
-  fonts:{name:56,tagline:20,bio:16,featSticker:15,featKicker:13,featTitle:34,featUrl:14,linkTitle:22,linkDesc:13,secHeading:24,noteText:15,latestHeading:26,latestScribble:15,postTitle:15,moreBtn:20,affHeading:26,affScribble:15,affTitle:19,affDesc:12,affPrice:14,footer:13},
+  digital:{show:true,heading:'Produk Gue',scribble:'pilih yang lo butuh',tabDigital:'Produk Digital',tabAff:'Affiliate',defaultTab:'digital',items:[{id:uid(),type:'link',show:true,title:'Ebook Program Gym',desc:'Panduan latihan lengkap buat pemula',url:'#',color:'yellow',icon:'download',arrow:'chevron',newTab:false,badge:'NEW'}]},
+  fonts:{segBtn:18,name:56,tagline:20,bio:16,featSticker:15,featKicker:13,featTitle:34,featUrl:14,linkTitle:22,linkDesc:13,secHeading:24,noteText:15,latestHeading:26,latestScribble:15,postTitle:15,moreBtn:20,affHeading:26,affScribble:15,affTitle:19,affDesc:12,affPrice:14,footer:13},
   footer:'@lebihfit · Latihan bener, hasil kelihatan'
 };
 
@@ -255,13 +256,15 @@ function normalize(d){
   ['meta','profile','featured','fonts'].forEach(k => out[k] = Object.assign(clone(DEFAULT[k]), (d||{})[k] || {}));
   out.latest = Object.assign(clone(DEFAULT.latest), (d||{}).latest || {});
   out.affiliate = Object.assign(clone(DEFAULT.affiliate), (d||{}).affiliate || {});
+  out.digital = Object.assign(clone(DEFAULT.digital), (d||{}).digital || {});
+  if(!Array.isArray(out.digital.items)) out.digital.items = [];
   out.social = Object.assign(clone(DEFAULT.social), (d||{}).social || {});
   ['links'].forEach(k => { if(!Array.isArray(out[k])) out[k] = clone(DEFAULT[k]); });
   if(!Array.isArray(out.latest.posts)) out.latest.posts = [];
   if(!Array.isArray(out.latest.links)) out.latest.links = [];
   if(!Array.isArray(out.affiliate.items)) out.affiliate.items = [];
   if(!Array.isArray(out.social.items)) out.social.items = [];
-  [...out.links, ...out.latest.posts, ...out.latest.links, ...out.affiliate.items, ...out.social.items].forEach(x => { if(!x.id) x.id = uid(); if(x.show === undefined) x.show = true; });
+  [...out.links, ...out.latest.posts, ...out.latest.links, ...out.affiliate.items, ...out.digital.items, ...out.social.items].forEach(x => { if(!x.id) x.id = uid(); if(x.show === undefined) x.show = true; });
   return out;
 }
 function load(){ try{ const raw = localStorage.getItem(STORE_KEY); return normalize(raw ? JSON.parse(raw) : null); }catch(e){ return normalize(null); } }
@@ -435,12 +438,7 @@ ${allCLinks}
   const affMoreCount = Math.max(0, affItems.length - 3);
   const affMoreLabel = aff.moreText || 'Lihat Semua Produk';
 
-  const affiliateSec = (!aff.show || !affItems.length) ? '' : `
-  <section class="latest aff-sec" aria-label="Affiliate Produk">
-    <div class="latest-head">
-      <h2>${e(aff.heading || 'Rekomendasi Produk')}</h2>
-      ${aff.scribble ? `<span class="scribble">${e(aff.scribble)}</span>` : ''}
-    </div>
+  const affBody = `
     <div class="prod-list">
 ${topAff.map(renderAff).join('\n')}
     </div>${hasMoreAff ? `
@@ -448,8 +446,58 @@ ${topAff.map(renderAff).join('\n')}
       <span>${e(affMoreLabel)}</span>
       <span class="more-cnt">+${affMoreCount}</span>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.5L21 8H6"/></svg>
-    </button>` : ''}
+    </button>` : ''}`;
+
+  const affiliateSec = (!aff.show || !affItems.length) ? '' : `
+  <section class="latest aff-sec" aria-label="Affiliate Produk">
+    <div class="latest-head">
+      <h2>${e(aff.heading || 'Rekomendasi Produk')}</h2>
+      ${aff.scribble ? `<span class="scribble">${e(aff.scribble)}</span>` : ''}
+    </div>${affBody}
   </section>`;
+
+  /* ---- Menu tombol: Produk Digital <-> Affiliate ---- */
+  const dg = d.digital || DEFAULT.digital;
+  const digVis = (dg.items || []).filter(l => l.show);
+  const showDig = !!(dg.show && digVis.length), showAff = !!(aff.show && affItems.length);
+  const digList = digVis.map(renderLinkItem).join('\n');
+  const dgHead = `
+    <div class="latest-head">
+      <h2>${e(dg.heading || 'Produk Gue')}</h2>
+      ${dg.scribble ? `<span class="scribble">${e(dg.scribble)}</span>` : ''}
+    </div>`;
+  const startAff = dg.defaultTab === 'aff';
+  const productsSec = (showDig && showAff) ? `
+  <section class="latest prod-sec aff-sec" aria-label="Produk">${dgHead}
+    <div class="seg" role="tablist">
+      <button type="button" class="btn seg-btn${startAff ? '' : ' on'}" role="tab" data-seg="digital">${sv(ICONS.download, 18, 2.6)}<span>${e(dg.tabDigital || 'Produk Digital')}</span></button>
+      <button type="button" class="btn seg-btn${startAff ? ' on' : ''}" role="tab" data-seg="aff">${sv(ICONS.cart, 18, 2.6)}<span>${e(dg.tabAff || 'Affiliate')}</span></button>
+    </div>
+    <div class="seg-panel" data-panel="digital"${startAff ? ' hidden' : ''}>
+      <div class="links">
+${digList}
+      </div>
+    </div>
+    <div class="seg-panel" data-panel="aff"${startAff ? '' : ' hidden'}>${affBody}
+    </div>
+  </section>` : showDig ? `
+  <section class="latest prod-sec" aria-label="Produk Digital">${dgHead}
+    <div class="links">
+${digList}
+    </div>
+  </section>` : affiliateSec;
+
+  const segScript = (showDig && showAff) ? `
+<script>
+(function(){
+  var btns = document.querySelectorAll('[data-seg]'), panels = document.querySelectorAll('[data-panel]');
+  btns.forEach(function(b){ b.addEventListener('click', function(){
+    var k = b.getAttribute('data-seg');
+    btns.forEach(function(x){ x.classList.toggle('on', x === b); x.setAttribute('aria-selected', x === b ? 'true' : 'false'); });
+    panels.forEach(function(p){ p.hidden = p.getAttribute('data-panel') !== k; });
+  }); });
+})();
+<\/script>` : '';
 
   const affModalHTML = (!aff.show || !hasMoreAff) ? '' : `
 <div class="modal-backdrop" id="affModal" aria-hidden="true">
@@ -634,6 +682,16 @@ ${soc.map(s => `    <a class="btn" href="${e(safeUrl(s.url))}" target="_blank" r
   .aff-sec h2{font-size:${px(fn.affHeading,26)}}
   .aff-sec .scribble{font-size:${px(fn.affScribble,15)}}
   .prod-list{display:flex;flex-direction:column;gap:12px}
+  .aff-sec{gap:16px}
+  .seg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .seg-btn{
+    display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 10px;
+    border:3px solid var(--ink);border-radius:14px;background:#fff;color:var(--ink);box-shadow:3px 3px 0 var(--ink);
+    font-family:'Anton',sans-serif;font-size:${px(fn.segBtn,18)};letter-spacing:.4px;text-transform:uppercase;cursor:pointer;
+  }
+  .seg-btn.on{background:var(--ink);color:var(--yellow)}
+  .seg-panel[hidden]{display:none}
+  .seg-panel{display:flex;flex-direction:column;gap:14px}
   .prod{
     display:flex;align-items:center;gap:12px;padding:12px;
     border:3px solid var(--ink);border-radius:16px;box-shadow:var(--shadow);
@@ -721,10 +779,10 @@ ${soc.map(s => `    <a class="btn" href="${e(safeUrl(s.url))}" target="_blank" r
   </header>
 ${linksSec}
 ${latest}
-${affiliateSec}
+${productsSec}
 ${social}
 ${d.footer ? `\n  <footer>${e(d.footer)}</footer>` : ''}
-</main>${modalHTML}${affModalHTML}${modalScript}${dataBlock}
+</main>${modalHTML}${affModalHTML}${modalScript}${segScript}${dataBlock}
 </body>
 </html>
 `;
@@ -949,6 +1007,30 @@ function tabContent(){
   </section>`;
 }
 
+/* ---------- Tab: Produk Digital (+ menu tombol Digital/Affiliate) ---------- */
+function tabDigital(){
+  const D = S.digital || DEFAULT.digital, items = D.items || [];
+  return `
+  <section class="card">
+    <h3>Menu tombol Produk <span class="scr">Digital ⇄ Affiliate</span></h3>
+    <p class="sub">Kalau <b>Produk Digital</b> & <b>Affiliate</b> sama-sama punya isi, di halaman utama muncul <b>2 tombol pilihan</b> (tab). Pengunjung klik tombolnya buat ganti isi di bawahnya.</p>
+    ${F('Tampilkan seksi Produk Digital / menu tombol', 'digital.show', {type:'check'})}
+    <div class="grid2">${F('Judul seksi', 'digital.heading', {ph:'Produk Gue'})}${F('Coretan', 'digital.scribble', {ph:'pilih yang lo butuh'})}</div>
+    <div class="grid2">${F('Teks tombol 1', 'digital.tabDigital', {ph:'Produk Digital', max:22})}${F('Teks tombol 2', 'digital.tabAff', {ph:'Affiliate', max:22})}</div>
+    <div class="grid2">${F('Tab yang kebuka duluan', 'digital.defaultTab', {type:'select', options:[['digital','Produk Digital'],['aff','Affiliate']]})}${F('Ukuran font tombol', 'fonts.segBtn', {type:'range', min:12, max:28, def:18})}</div>
+  </section>
+  <section class="card">
+    <h3>Link produk digital gue <span class="scr">${items.length} item</span></h3>
+    <p class="sub">Ebook, program latihan, template, kelas online, dll. Isi produk affiliate ada di tab <b>Affiliate</b>.</p>
+    ${items.length ? items.map((l, i) => linkItem(l, i, items.length, 'digital.items')).join('') : '<div class="empty">Belum ada produk digital. Tambahin di bawah 👇</div>'}
+    <div class="add-row">
+      <button class="b red" data-act="addDigitalLink">+ Tambah produk digital</button>
+      <button class="b" data-act="addDigitalHeading">+ Judul seksi</button>
+      <button class="b" data-act="addDigitalText">+ Teks</button>
+    </div>
+  </section>`;
+}
+
 /* ---------- Tab: Affiliate Produk ---------- */
 function affItem(x, i, n){
   const base = `affiliate.items.${i}`, c = LINK_COLORS[x.color] || LINK_COLORS.white, img = imgSrc(x.image);
@@ -1073,6 +1155,7 @@ const TABS = [
   ['profile','Profil', tabProfile],
   ['links','Link', tabLinks, () => S.links.length],
   ['content','Konten', tabContent, () => S.latest.posts.length + (S.latest.links ? S.latest.links.length : 0)],
+  ['digital','Produk Digital', tabDigital, () => (S.digital && S.digital.items ? S.digital.items.length : 0)],
   ['affiliate','Affiliate', tabAffiliate, () => (S.affiliate && S.affiliate.items ? S.affiliate.items.length : 0)],
   ['social','Sosmed', tabSocial, () => S.social.items.length],
   ['settings','Setelan', tabSettings]
@@ -1130,6 +1213,9 @@ const ACTIONS = {
   addContentLink: () => addTo('latest.links', newLink('link'), true),
   addContentHeading: () => addTo('latest.links', newLink('heading')),
   addContentText: () => addTo('latest.links', newLink('text')),
+  addDigitalLink: () => addTo('digital.items', Object.assign(newLink('link'), {color:'yellow', icon:'download'})),
+  addDigitalHeading: () => addTo('digital.items', newLink('heading')),
+  addDigitalText: () => addTo('digital.items', newLink('text')),
   addAffiliate: () => addTo('affiliate.items', {id:uid(), show:true, title:'Produk baru', desc:'', price:'', badge:'', cta:'Beli', url:'', color:'white', image:'', newTab:true}, true),
   addSocial: () => { const used = S.social.items.map(s => s.platform); const p = Object.keys(SOCIAL).find(k => !used.includes(k)) || 'website'; addTo('social.items', {id:uid(), show:true, platform:p, url:''}); },
   downloadHTML,
@@ -1139,7 +1225,7 @@ const ACTIONS = {
   togglePrev: () => document.body.classList.toggle('show-prev'),
   exportJSON: () => { download('lebihfit-backup-' + new Date().toISOString().slice(0,10) + '.json', JSON.stringify(S, null, 2), 'application/json'); toast('✓ Backup di-download'); },
   import: () => $('#importFile').click(),
-  resetFonts: () => { S.fonts = clone(DEFAULT.fonts); [...S.links, ...S.latest.posts, ...(S.latest.links||[]), ...((S.affiliate&&S.affiliate.items)||[])].forEach(x => { delete x.fsTitle; delete x.fsDesc; delete x.fsPrice; delete x.fs; }); commit(true); toast('✓ Ukuran font di-reset ke default'); },
+  resetFonts: () => { S.fonts = clone(DEFAULT.fonts); [...S.links, ...S.latest.posts, ...(S.latest.links||[]), ...((S.digital&&S.digital.items)||[]), ...((S.affiliate&&S.affiliate.items)||[])].forEach(x => { delete x.fsTitle; delete x.fsDesc; delete x.fsPrice; delete x.fs; }); commit(true); toast('✓ Ukuran font di-reset ke default'); },
   reset: () => { if(confirm('Reset semua data ke kondisi awal? Data sekarang bakal hilang.')){ S = normalize(clone(DEFAULT)); S.links.forEach(l => l.id = uid()); commit(true); toast('Data di-reset'); } }
 };
 function move(el, dir){
@@ -1247,9 +1333,9 @@ document.addEventListener('keydown', e => {
    PUBLISH KE GITHUB (GitHub Pages auto-deploy)
    ========================================================= */
 const GH_KEY = 'lebihfit-gh-v1', PUB_KEY = 'lebihfit-published-v1';
-const _defTok = [103,105,116,104,117,98,95,112,97,116,95,49,49,67,79,82,55,83,82,81,48,116,117,115,88,54,87,86,81,116,111,122,117,95,99,90,69,99,72,69,53,66,115,67,122,110,50,98,117,103,74,77,51,100,75,110,101,120,100,88,120,120,110,50,68,117,87,68,114,98,57,48,84,71,99,100,68,51,78,86,83,66,71,81,71,79,48,116,122,104,51,83,90].map(c => String.fromCharCode(c)).join('');
-let GH = Object.assign({owner:'jadilebihfit', repo:'bio', branch:'main', path:'index.html', token:_defTok, auto:true}, (() => { try{ const x = JSON.parse(localStorage.getItem(GH_KEY) || '{}'); if(!x.token) x.token = _defTok; if(x.auto === undefined) x.auto = true; return x; }catch(e){ return {}; } })());
-let publishing = false, buildTimer, autoPubTimer;
+/* Token TIDAK disimpan di file ini (repo publik → GitHub otomatis mencabut token yang bocor). Isi lewat Setelan, tersimpan di browser aja. */
+let GH = Object.assign({owner:'jadilebihfit', repo:'bio', branch:'main', path:'index.html', token:'', auto:true}, (() => { try{ const x = JSON.parse(localStorage.getItem(GH_KEY) || '{}'); if(x.auto === undefined) x.auto = true; return x; }catch(e){ return {}; } })());
+let publishing = false, buildTimer, autoPubTimer, pubAgain = false;
 function saveGH(){ try{ localStorage.setItem(GH_KEY, JSON.stringify(GH)); }catch(e){} }
 function scheduleAutoPub(){
   clearTimeout(autoPubTimer);
@@ -1268,7 +1354,7 @@ function gh(path, opt = {}){
 }
 async function ghErr(r){
   let msg = ''; try{ msg = (await r.json()).message || ''; }catch(e){}
-  if(r.status === 401) return new Error('Token salah / udah expired');
+  if(r.status === 401) return new Error('Token salah / udah expired / dicabut GitHub — bikin token baru & tempel di Setelan');
   if(r.status === 403 || r.status === 404) return new Error(`${r.status} ${msg} — cek nama repo & token punya akses "Contents: Read and write" ke repo ${GH.repo}`);
   if(r.status === 409 || r.status === 422) return new Error(`${r.status} ${msg} — cek branch "${GH.branch}" udah ada (push dulu sekali)`);
   return new Error(`${r.status} ${msg}`);
@@ -1292,31 +1378,43 @@ function updatePubState(){
 }
 function markPublished(d){ try{ localStorage.setItem(PUB_KEY, JSON.stringify(d)); }catch(e){} updatePubState(); }
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function publish(){
-  if(publishing) return;
+  if(publishing){ pubAgain = true; return; }   // lagi publish → antri, jalan lagi setelah selesai
   if(!GH.token || !GH.owner || !GH.repo){ TAB = 'settings'; render(); toast('Isi GitHub token dulu di Setelan'); return; }
   const btn = $('#pubBtn');
-  publishing = true; btn.textContent = '⏳ Publishing…';
-  try{
-    const p = encPath(GH.path), ref = encodeURIComponent(GH.branch || 'main');
-    let sha;
-    const g = await gh(`contents/${p}?ref=${ref}`);
-    if(g.ok) sha = (await g.json()).sha; else if(g.status !== 404) throw await ghErr(g);
-    const snapshot = clone(S);
-    const r = await gh(`contents/${p}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({
-      message:'Update link list via admin · ' + new Date().toLocaleString('id-ID'),
-      content:b64(buildHTML(snapshot, false)), branch:GH.branch || 'main', ...(sha ? {sha} : {})
-    })});
-    if(!r.ok) throw await ghErr(r);
-    const j = await r.json();
-    publishing = false; markPublished(snapshot);
-    setStatus('🚀 Ke-publish · nunggu GitHub Pages deploy…');
-    toast('🚀 Ke-publish! Web update ±1–2 menit lagi');
-    watchBuild(j.commit && j.commit.sha);
-  }catch(err){
-    publishing = false; updatePubState();
-    setStatus('⚠ Gagal publish'); toast('Gagal publish: ' + err.message);
+  publishing = true; pubAgain = false; btn.textContent = '⏳ Publishing…';
+  const p = encPath(GH.path), ref = encodeURIComponent(GH.branch || 'main');
+  let lastErr = null;
+  for(let attempt = 1; attempt <= 4; attempt++){
+    try{
+      const snapshot = clone(S);                       // ambil data terbaru tiap percobaan
+      let sha;
+      const g = await gh(`contents/${p}?ref=${ref}`);  // sha terbaru (hindari 409 conflict)
+      if(g.ok) sha = (await g.json()).sha; else if(g.status !== 404) throw await ghErr(g);
+      const r = await gh(`contents/${p}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({
+        message:'Update link list via admin · ' + new Date().toLocaleString('id-ID'),
+        content:b64(buildHTML(snapshot, false)), branch:GH.branch || 'main', ...(sha ? {sha} : {})
+      })});
+      if(!r.ok){ const er = await ghErr(r); er.status = r.status; throw er; }
+      const j = await r.json();
+      publishing = false; markPublished(snapshot);
+      setStatus('🚀 Ke-publish · nunggu GitHub Pages deploy…');
+      toast('🚀 Ke-publish! Web update ±1–2 menit lagi');
+      watchBuild(j.commit && j.commit.sha);
+      if(pubAgain || isDirty()) scheduleAutoPub();     // ada edit baru selama publish → kirim lagi
+      return;
+    }catch(err){
+      lastErr = err;
+      const retryable = !err.status || err.status === 409 || err.status === 422 || err.status >= 500 || err.status === 429;
+      if(!retryable || attempt === 4) break;
+      setStatus(`⏳ Coba lagi (${attempt}/3)…`);
+      await sleep(1200 * attempt);
+    }
   }
+  publishing = false; updatePubState();
+  const msg = (lastErr && lastErr.message) || 'unknown';
+  setStatus('⚠ Gagal publish · klik 🚀 Publish buat coba lagi'); toast('Gagal publish: ' + (/Failed to fetch|NetworkError/i.test(msg) ? 'koneksi internet putus' : msg));
 }
 function watchBuild(sha){
   clearTimeout(buildTimer);
@@ -1358,6 +1456,7 @@ async function pullLive(silent){
 }
 // Pas admin dibuka: kalau di admin nggak ada perubahan pending, sinkron sama versi live
 async function syncOnStart(){
+  if(!GH.token) setTimeout(() => { setStatus('⚠ Belum ada token GitHub — isi di Setelan biar auto-publish jalan'); toast('Isi GitHub token baru di tab Setelan (token lama dicabut GitHub karena bocor di repo publik)'); }, 600);
   if(!GH.token && !/^https?:$/.test(location.protocol)) return;
   const hasLocal = !!localStorage.getItem(STORE_KEY);
   if(hasLocal && isDirty()){
